@@ -1,0 +1,23 @@
+package:
+  name: fs-gcsfs
+  version: {{ GIT_DESCRIBE_TAG }}
+
+source:
+  git_url: ./
+
+build:
+  number: {{ GIT_DESCRIBE_NUMBER|int }}
+  noarch: python
+  script: python setup.py install  --single-version-externally-managed --record=record.txt
+
+requirements:
+  build:
+    - python
+    - setuptools
+  run:
+    - python ==3.*, >=3.5
+    - google-cloud-storage ==1.*, >=1.10.0
+    - fs ==2.*, >=2.1.0
+
+about:
+  summary: A PyFilesystem interface to Google Cloud Storage.
