@@ -14,14 +14,14 @@ To e.g. write and read a Pandas DataFrame via this module do:
 
 import itertools
 
-from typing import Optional, List, Generator, Union, Tuple, Iterator, BinaryIO
+from typing import Optional, List, Union, Tuple, Iterator
 
 import io
 import os
 import tempfile
 
 from fs import ResourceType, errors, tools
-from fs.base import FS, _OpendirFactory
+from fs.base import FS
 from fs.info import Info
 from fs.mode import Mode
 from fs.permissions import Permissions
@@ -71,7 +71,6 @@ class GCSFS(FS):
                  root_path: str = None,
                  project: str = None,
                  credentials: Credentials = None,
-                 region: str = None,
                  delimiter: str = STANDARD_DELIMITER,
                  strict: bool = True):
         self._bucket_name = bucket_name
@@ -81,7 +80,6 @@ class GCSFS(FS):
         self._prefix = relpath(normpath(root_path)).rstrip(delimiter)
         self.project = project
         self.credentials = credentials
-        self.region = region
         self.delimiter = delimiter
         self.strict = strict
 
@@ -94,7 +92,6 @@ class GCSFS(FS):
             self.__class__.__name__,
             self._bucket_name,
             root_path=(self.root_path, self.STANDARD_DELIMITER),
-            region=(self.region, None),
             delimiter=(self.delimiter, self.STANDARD_DELIMITER)
         )
 
@@ -123,70 +120,49 @@ class GCSFS(FS):
         namespaces = namespaces or ()
 
         _path = self.validatepath(path)
-        key = self._path_to_key(_path)
 
         if check_parent_dir:
-            dir_path = dirname(_path)
-            if dir_path != "/" and not self._check_and_fix_dir(dir_path):
+            parent_dir = dirname(_path)
+            parent_dir_key = self._path_to_dir_key(parent_dir)
+            if parent_dir != "/" and not self.bucket.get_blob(parent_dir_key):
                 raise errors.ResourceNotFound(path)
 
         if _path == "/":
             return self._dir_info("")
 
-        obj = self.bucket.get_blob(key)
-
-        if not obj:
-            if self._check_and_fix_dir(_path):
-                return self._dir_info(path)
-            else:
-                raise errors.ResourceNotFound(path)
-        return self._info_from_object(obj, namespaces)
-
-    def _check_and_fix_dir(self, path: str):  # TODO remove
-        """Checks if a path points to a GCS "directory" and makes sure the directory is marked according to fs-gcsfs standards.
-
-        As GCS is no real file system there is also no concept of folders. S3FS and GCSFS overcome this by adding empty files with the name "<path>/" every
-        time a directory is created, see https://fs-s3fs.readthedocs.io/en/latest/#limitations
-
-        This may lead to problems when working on data which was not created via GCSFS. This function tries to make the filesystem more robust by automatically
-        adding the missing file in case a directory is detected.
-        """
-        dir_key = self._path_to_dir_key(path)
-        if not self.bucket.get_blob(dir_key):
-            if next(self.bucket.list_blobs(prefix=dir_key).pages).num_items > 0:
-                # Apparently there are blobs under "path" but it is not yet marked as a directory
-                blob = self.bucket.blob(dir_key)
-                blob.upload_from_string(b"")
-                return True
-            else:
-                return False
+        # Check if there exists a blob at the provided path
+        key = self._path_to_key(_path)
+        dir_key = self._path_to_dir_key(_path)
+        blob = self.bucket.get_blob(key)
+        if blob:
+            return self._info_from_blob(blob, namespaces)
+        elif self.bucket.get_blob(dir_key):
+            # If not, check if the provided path is a directory
+            return self._dir_info(path)
         else:
-            return True
+            raise errors.ResourceNotFound(path)
 
-    def _info_from_object(self, obj: Blob, namespaces: Optional[List[str]] = None) -> Info:  # TODO
+    @staticmethod
+    def _info_from_blob(blob: Blob, namespaces: Optional[List[str]] = None) -> Info:
         """Make an info dict from a GCS object."""
-        path = obj.name
+        path = blob.name
         name = basename(path.rstrip("/"))
-        is_dir = path.endswith(self.delimiter)
         info = {
             "basic": {
                 "name": name,
-                "is_dir": is_dir
+                "is_dir": False
             }
         }
-        if "details" in namespaces:
-            if is_dir:
-                _type = int(ResourceType.directory)
-            else:
-                _type = int(ResourceType.file)
 
+        if "details" in namespaces:
             info["details"] = {
                 "accessed": None,
-                "modified": datetime_to_epoch(obj.updated),
-                "size": obj.size,
-                "type": _type
+                "modified": datetime_to_epoch(blob.updated),
+                "size": blob.size,
+                "type": int(ResourceType.file)
             }
-        # TODO missing namespaces: urls, gcs
+        # TODO more namespaces: basic, urls, gcs, ...
+
         return Info(info)
 
     def _dir_info(self, name: str) -> Info:
@@ -200,13 +176,22 @@ class GCSFS(FS):
             }
         })
 
-    def _scandir(self, path: str, return_info: bool = False, namespaces: List[str] = None) -> Union[Generator[str], Generator[Info]]:
-        # TODO docs
+    def _scandir(self, path: str, return_info: bool = False, namespaces: List[str] = None) -> Union[Iterator[str], Iterator[Info]]:
+        """Returns all the resources in a directory
+
+        Args:
+            path: Path to the directory on the filesystem which shall be scanned
+            return_info: If `True` instances of the type fs.info.Info are being returned. If `False` only the names of the resources are being returned.
+            namespaces: A list of namespaces to include in the resource information. Only considered if `return_info=True`.
+
+        Returns:
+            Either an iterator of Info instances for each resource in the directory or an iterator of string names for each resource in the directory
+        """
         namespaces = namespaces or ()
         _path = self.validatepath(path)
 
         if namespaces and not return_info:
-            raise ValueError("The provided namespaces are only considered if info=True")
+            raise ValueError("The provided namespaces are only considered if return_info=True")
 
         info = self.getinfo(_path)
         if not info.is_dir:
@@ -241,7 +226,7 @@ class GCSFS(FS):
             if blob.name == dir_key:  # Don't return root directory
                 continue
             if return_info:
-                yield self._info_from_object(blob, namespaces=namespaces)
+                yield self._info_from_blob(blob, namespaces=namespaces)
             else:
                 yield blob.name[prefix_len:]
 
@@ -400,7 +385,7 @@ class GCSFS(FS):
         except google.cloud.exceptions.NotFound:
             raise errors.ResourceNotFound(path)
 
-    def setinfo(self, path, info):  # TODO Copied from S3FS but I don't get it
+    def setinfo(self, path, info):
         self.getinfo(path)
 
     def copy(self, src_path: str, dst_path: str, overwrite: bool = False) -> None:
@@ -452,7 +437,7 @@ class GCSFS(FS):
         except errors.ResourceNotFound:
             return False
 
-    def opendir(self, path: str, factory: Optional[_OpendirFactory] = None) -> SubFS[FS]:
+    def opendir(self, path: str, factory=None) -> SubFS[FS]:
         # Implemented to support skipping the directory check if strict=False
         _factory = factory or SubFS
 
@@ -460,6 +445,44 @@ class GCSFS(FS):
             raise errors.DirectoryExpected(path=path)
 
         return _factory(self, path)
+
+    def fix_storage(self) -> None:  # TODO test
+        """Walks the entire bucket and makes sure that all intermediate directories are correctly marked with empty blobs.
+
+        As GCS is no real file system but only a key-value store, there is also no concept of folders. S3FS and GCSFS overcome this limitation by adding
+        empty files with the name "<path>/" every time a directory is created, see https://fs-s3fs.readthedocs.io/en/latest/#limitations.
+
+        This may lead to problems when working on data which was not created via GCSFS, e.g. data that was manually copied to the bucket.
+
+        This utility function fixes all inconsistencies within the filesystem by adding any missing marker blobs.
+        """
+        names = [blob.name for blob in self.bucket.list_blobs()]
+        marked_dirs = set()
+        all_dirs = set()
+
+        for name in names:
+            # If a blob ends with a slash, it's a directory marker
+            if name.endswith("/"):
+                marked_dirs.add(dirname(name))
+
+            name = dirname(name)
+            while name != "":
+                all_dirs.add(name)
+                name = dirname(name)
+
+        unmarked_dirs = all_dirs.difference(marked_dirs)
+        print("{} directories in total".format(len(all_dirs)))
+
+        if len(unmarked_dirs) > 0:
+            print("{} directories are not yet marked correctly".format(len(unmarked_dirs)))
+            for unmarked_dir in unmarked_dirs:
+                dir_name = forcedir(unmarked_dir)
+                print("Creating directory marker " + dir_name)
+                blob = self.bucket.blob(dir_name)
+                blob.upload_from_string(b"")
+            print("Successfully created {} directory markers".format(len(unmarked_dirs)))
+        else:
+            print("All directories are correctly marked")
 
     # ----- Functions which are implemented in S3FS but not in GCSFS (potential performance improvements) -----
     # def isempty(self, path):
