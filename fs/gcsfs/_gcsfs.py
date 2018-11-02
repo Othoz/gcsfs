@@ -14,16 +14,17 @@ To e.g. write and read a Pandas DataFrame via this module do:
 
 import itertools
 
-from typing import Optional
+from typing import Optional, List, Generator, Union, Tuple, Iterator, BinaryIO
 
 import io
 import os
 import tempfile
 
 from fs import ResourceType, errors, tools
-from fs.base import FS
+from fs.base import FS, _OpendirFactory
 from fs.info import Info
 from fs.mode import Mode
+from fs.permissions import Permissions
 from fs.subfs import SubFS
 from fs.path import basename, dirname, forcedir, normpath, relpath, join
 from fs.time import datetime_to_epoch
@@ -34,8 +35,6 @@ from google.cloud.storage import Client
 from google.cloud.storage.blob import Blob
 
 __all__ = ["GCSFS"]
-
-# TODO Type annotations for all functions
 
 
 class GCSFS(FS):
@@ -55,7 +54,7 @@ class GCSFS(FS):
             which may speed up uploads / downloads.
     """
 
-    _meta = {  # Used by https://docs.pyfilesystem.org/en/latest/reference/base.html#fs.base.FS.getmeta
+    _meta = {
         "case_insensitive": False,
         "invalid_path_chars": "\0",
         "network": True,
@@ -90,7 +89,7 @@ class GCSFS(FS):
         self.bucket = self.client.get_bucket(self._bucket_name)
         super(GCSFS, self).__init__()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return _make_repr(
             self.__class__.__name__,
             self._bucket_name,
@@ -99,26 +98,26 @@ class GCSFS(FS):
             delimiter=(self.delimiter, self.STANDARD_DELIMITER)
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "<gcsfs '{}'>".format(
             join(self._bucket_name, relpath(self.root_path))
         )
 
-    def _path_to_key(self, path):  # Do we need this?
+    def _path_to_key(self, path: str) -> str:
         """Converts an fs path to a GCS key."""
         path = relpath(normpath(path))
         return self.delimiter.join([self._prefix, path]).lstrip("/").replace("/", self.delimiter)
 
-    def _path_to_dir_key(self, path):  # Do we need this?
+    def _path_to_dir_key(self, path: str) -> str:
         """Converts an fs path to a GCS dict key."""
         return forcedir(self._path_to_key(path))
 
-    def _get_blob(self, key) -> Optional[Blob]:
+    def _get_blob(self, key: str) -> Optional[Blob]:
         """Returns blob if exists or None otherwise"""
         key = key.rstrip(self.delimiter)
         return self.bucket.get_blob(key)
 
-    def getinfo(self, path, namespaces=None, check_parent_dir=True):
+    def getinfo(self, path: str, namespaces: Optional[List[str]] = None, check_parent_dir: bool = True) -> Info:
         if check_parent_dir:
             self.check()
         namespaces = namespaces or ()
@@ -143,7 +142,7 @@ class GCSFS(FS):
                 raise errors.ResourceNotFound(path)
         return self._info_from_object(obj, namespaces)
 
-    def _check_and_fix_dir(self, path: str):
+    def _check_and_fix_dir(self, path: str):  # TODO remove
         """Checks if a path points to a GCS "directory" and makes sure the directory is marked according to fs-gcsfs standards.
 
         As GCS is no real file system there is also no concept of folders. S3FS and GCSFS overcome this by adding empty files with the name "<path>/" every
@@ -164,7 +163,7 @@ class GCSFS(FS):
         else:
             return True
 
-    def _info_from_object(self, obj, namespaces) -> Info:  # TODO
+    def _info_from_object(self, obj: Blob, namespaces: Optional[List[str]] = None) -> Info:  # TODO
         """Make an info dict from a GCS object."""
         path = obj.name
         name = basename(path.rstrip("/"))
@@ -201,7 +200,8 @@ class GCSFS(FS):
             }
         })
 
-    def _scandir(self, path, return_info=False, namespaces=None):
+    def _scandir(self, path: str, return_info: bool = False, namespaces: List[str] = None) -> Union[Generator[str], Generator[Info]]:
+        # TODO docs
         namespaces = namespaces or ()
         _path = self.validatepath(path)
 
@@ -245,21 +245,21 @@ class GCSFS(FS):
             else:
                 yield blob.name[prefix_len:]
 
-    def listdir(self, path):
+    def listdir(self, path: str) -> List[str]:
         result = list(self._scandir(path))
         if not result:
             if not self.getinfo(path).is_dir:
                 raise errors.DirectoryExpected(path)
         return result
 
-    def scandir(self, path, namespaces=None, page=None):
+    def scandir(self, path: str, namespaces: Optional[List[str]] = None, page: Optional[Tuple[int, int]] = None) -> Iterator[Info]:
         iter_info = self._scandir(path, return_info=True, namespaces=namespaces)
         if page is not None:
             start, end = page
             iter_info = itertools.islice(iter_info, start, end)
         return iter_info
 
-    def makedir(self, path, permissions=None, recreate=False):
+    def makedir(self, path: str, permissions: Optional[Permissions] = None, recreate: bool = False) -> SubFS[FS]:
         """Make a directory.
 
         Note:
@@ -290,7 +290,7 @@ class GCSFS(FS):
 
         return SubFS(self, path)
 
-    def makedirs(self, path, permissions=None, recreate=False) -> SubFS[FS]:
+    def makedirs(self, path: str, permissions: Optional[Permissions] = None, recreate: bool = False) -> SubFS[FS]:
         """Make a directory, and any missing intermediate directories.
 
         Note:
@@ -313,7 +313,7 @@ class GCSFS(FS):
                 raise
         return self.opendir(path)
 
-    def openbin(self, path, mode="r", buffering=-1, **options):
+    def openbin(self, path: str, mode: str = "r", buffering: int = -1, **options) -> "GCSFile":
         _mode = Mode(mode)
         _mode.validate_bin()
         self.check()
@@ -370,7 +370,7 @@ class GCSFS(FS):
         gcs_file.seek(0)
         return gcs_file
 
-    def remove(self, path):
+    def remove(self, path: str) -> None:
         self.check()
         _path = self.validatepath(path)
         _key = self._path_to_key(_path)
@@ -383,7 +383,7 @@ class GCSFS(FS):
         except google.cloud.exceptions.NotFound:
             raise errors.ResourceNotFound(path)
 
-    def removedir(self, path):
+    def removedir(self, path: str) -> None:
         self.check()
         _path = self.validatepath(path)
         if _path == "/":
@@ -403,7 +403,7 @@ class GCSFS(FS):
     def setinfo(self, path, info):  # TODO Copied from S3FS but I don't get it
         self.getinfo(path)
 
-    def copy(self, src_path, dst_path, overwrite=False):
+    def copy(self, src_path: str, dst_path: str, overwrite: bool = False) -> None:
         if not overwrite and self.exists(dst_path):
             raise errors.DestinationExists(dst_path)
         _src_path = self.validatepath(src_path)
@@ -421,11 +421,11 @@ class GCSFS(FS):
             raise errors.ResourceNotFound(_src_key)
         self.bucket.copy_blob(blob, self.bucket, new_name=_dst_key)
 
-    def move(self, src_path, dst_path, overwrite=False):
+    def move(self, src_path: str, dst_path: str, overwrite: bool = False) -> None:
         self.copy(src_path, dst_path, overwrite=overwrite)
         self.remove(src_path)
 
-    def exists(self, path):
+    def exists(self, path: str) -> bool:
         self.check()
         _path = self.validatepath(path)
         if _path == "/":
@@ -437,7 +437,7 @@ class GCSFS(FS):
         else:
             return self.isdir(path)
 
-    def geturl(self, path, purpose="download"):  # See https://fs-s3fs.readthedocs.io/en/latest/index.html#urls
+    def geturl(self, path: str, purpose: str = "download"):  # See https://fs-s3fs.readthedocs.io/en/latest/index.html#urls
         _path = self.validatepath(path)
         _key = self._path_to_key(_path)
         if purpose == "download":
@@ -445,14 +445,14 @@ class GCSFS(FS):
         else:
             raise errors.NoURL(path, purpose)
 
-    def isdir(self, path):
+    def isdir(self, path: str) -> bool:
         _path = self.validatepath(path)
         try:
             return self.getinfo(_path, check_parent_dir=False).is_dir
         except errors.ResourceNotFound:
             return False
 
-    def opendir(self, path, factory=None) -> SubFS[FS]:
+    def opendir(self, path: str, factory: Optional[_OpendirFactory] = None) -> SubFS[FS]:
         # Implemented to support skipping the directory check if strict=False
         _factory = factory or SubFS
 
@@ -469,12 +469,12 @@ class GCSFS(FS):
     # def setbinfile(self, path, file):
 
 
-class GCSFile(io.IOBase):  # Identical to s3file
-    """Proxy for a GCS file.
+class GCSFile(io.IOBase):
+    """Proxy for a GCS blob. Identical to S3File from https://github.com/PyFilesystem/s3fs
 
     Note:
-        Instead of performing all operations directly on the cloud (which is in some cases not even possible) everything is “buffered“ in a local file and only
-        written on close.
+        Instead of performing all operations directly on the cloud (which is in some cases not even possible)
+        everything is “buffered“ in a local file and only written on close.
     """
 
     @classmethod
@@ -585,9 +585,8 @@ class GCSFile(io.IOBase):  # Identical to s3file
         return size
 
 
-def _make_repr(class_name, *args, **kwargs):  # Identical to S3FS implementation
-    """
-    Generate a repr string.
+def _make_repr(class_name, *args, **kwargs):
+    """Generate a repr string. Identical to S3FS implementation
 
     Positional arguments should be the positional arguments used to
     construct the class. Keyword arguments should consist of tuples of
@@ -604,9 +603,5 @@ def _make_repr(class_name, *args, **kwargs):  # Identical to S3FS implementation
 
     """
     arguments = [repr(arg) for arg in args]
-    arguments.extend(
-        "{}={!r}".format(name, value)
-        for name, (value, default) in sorted(kwargs.items())
-        if value != default
-    )
+    arguments.extend("{}={!r}".format(name, value) for name, (value, default) in sorted(kwargs.items()) if value != default)
     return "{}({})".format(class_name, ", ".join(arguments))

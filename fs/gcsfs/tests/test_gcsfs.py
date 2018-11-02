@@ -3,7 +3,7 @@ import uuid
 
 from fs.test import FSTestCases
 
-from gcsfs import GCSFS
+from fs.gcsfs import GCSFS
 
 
 class TestGCSFS(FSTestCases, unittest.TestCase):
