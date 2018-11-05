@@ -16,10 +16,10 @@ if __name__ == "__main__":
         ],
         entry_points={
             'fs.opener': [
-                'gs = gcsfs.opener:GCSFSOpener',
+                'gs = fs_gcsfs.opener:GCSFSOpener',
             ]
         },
-        packages=["gcsfs"],
+        packages=["fs_gcsfs"],
         # By default setuptools tries to detect automagically if a package can be zipped. However,
         # a zipped package does seem to not work well with conda - so we force setuptools to not
         # zip the package
