@@ -1,16 +1,15 @@
 from setuptools import setup
-import versioneer
-
+from fs_gcsfs.__version__ import __version__
 
 if __name__ == "__main__":
     setup(
         name='fs-gcsfs',
         author="Othoz",
         description="A PyFilesystem interface to Google Cloud Storage",
-        url="http://othoz.com",  # TODO This will become the Github Repo URL
+        url="https://github.com/Othoz/gcsfs",
         license="MIT",
-        version=versioneer.get_version(),
-        cmdclass=versioneer.get_cmdclass(),
+        version=__version__,
+        python_requires=">=3.5",
         install_requires=[
             "fs~=2.1.0"
         ],
@@ -20,9 +19,4 @@ if __name__ == "__main__":
             ]
         },
         packages=["fs_gcsfs"],
-        # By default setuptools tries to detect automagically if a package can be zipped. However,
-        # a zipped package does seem to not work well with conda - so we force setuptools to not
-        # zip the package
-        zip_safe=False,
-        # Missing: python_requires
     )

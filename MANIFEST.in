@@ -1,2 +1,0 @@
-include versioneer.py
-include gcsfs/_version.py
