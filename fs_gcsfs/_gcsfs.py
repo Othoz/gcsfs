@@ -13,6 +13,7 @@ To e.g. write and read a Pandas DataFrame via this module do:
 """
 
 import itertools
+import logging
 
 from typing import Optional, List, Union, Tuple, Iterator
 
@@ -35,6 +36,8 @@ from google.cloud.storage import Client
 from google.cloud.storage.blob import Blob
 
 __all__ = ["GCSFS"]
+
+logger = logging.getLogger()
 
 
 class GCSFS(FS):
@@ -111,7 +114,7 @@ class GCSFS(FS):
 
     def _get_blob(self, key: str) -> Optional[Blob]:
         """Returns blob if exists or None otherwise"""
-        key = key.rstrip(self.delimiter)
+        # TODO This method should be responsible for correctly converting PyFilesystem to GCSFS delimiters
         return self.bucket.get_blob(key)
 
     def getinfo(self, path: str, namespaces: Optional[List[str]] = None, check_parent_dir: bool = True) -> Info:
@@ -124,20 +127,21 @@ class GCSFS(FS):
         if check_parent_dir:
             parent_dir = dirname(_path)
             parent_dir_key = self._path_to_dir_key(parent_dir)
-            if parent_dir != "/" and not self.bucket.get_blob(parent_dir_key):
+            if parent_dir != "/" and not self._get_blob(parent_dir_key):
                 raise errors.ResourceNotFound(path)
 
         if _path == "/":
             return self._dir_info("")
 
-        # Check if there exists a blob at the provided path
         key = self._path_to_key(_path)
         dir_key = self._path_to_dir_key(_path)
-        blob = self.bucket.get_blob(key)
+
+        blob = self._get_blob(key)
         if blob:
+            # Check if there exists a blob at the provided path, return the corresponding object Info
             return self._info_from_blob(blob, namespaces)
-        elif self.bucket.get_blob(dir_key):
-            # If not, check if the provided path is a directory
+        elif self._get_blob(dir_key):
+            # Check if there exists a blob with a slash at the end, return the corresponding directory Info
             return self._dir_info(path)
         else:
             raise errors.ResourceNotFound(path)
@@ -472,18 +476,18 @@ class GCSFS(FS):
         all_dirs.add(self.root_path)
 
         unmarked_dirs = all_dirs.difference(marked_dirs)
-        print("{} directories in total".format(len(all_dirs)))
+        logger.info("{} directories in total".format(len(all_dirs)))
 
         if len(unmarked_dirs) > 0:
-            print("{} directories are not yet marked correctly".format(len(unmarked_dirs)))
+            logger.info("{} directories are not yet marked correctly".format(len(unmarked_dirs)))
             for unmarked_dir in unmarked_dirs:
                 dir_name = forcedir(unmarked_dir)
-                print("Creating directory marker " + dir_name)
+                logger.debug("Creating directory marker " + dir_name)
                 blob = self.bucket.blob(dir_name)
                 blob.upload_from_string(b"")
-            print("Successfully created {} directory markers".format(len(unmarked_dirs)))
+            logger.info("Successfully created {} directory markers".format(len(unmarked_dirs)))
         else:
-            print("All directories are correctly marked")
+            logger.info("All directories are correctly marked")
 
     # ----- Functions which are implemented in S3FS but not in GCSFS (potential performance improvements) -----
     # def isempty(self, path):
@@ -501,6 +505,12 @@ class GCSFile(io.IOBase):
         everything is “buffered“ in a local file and only written on close.
     """
 
+    def __init__(self, f, filename, mode, on_close=None):
+        self._f = f
+        self.__filename = filename
+        self.__mode = mode
+        self._on_close = on_close
+
     @classmethod
     def factory(cls, filename, mode, on_close):
         """Create a GCSFile backed with a temporary file."""
@@ -514,12 +524,6 @@ class GCSFile(io.IOBase):
             self.__filename,
             self.__mode
         )
-
-    def __init__(self, f, filename, mode, on_close=None):
-        self._f = f
-        self.__filename = filename
-        self.__mode = mode
-        self._on_close = on_close
 
     def __enter__(self):
         return self
