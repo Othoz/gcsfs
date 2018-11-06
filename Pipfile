@@ -3,16 +3,11 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
-[requires]
-python_version = "3.5"
-
-[packages]
-fs = "*"
-google-cloud-storage = "*"
-
 [dev-packages]
 flake8 = "*"
 pytest = "*"
 pytest-cov = "*"
-pytest-sugar = "*"
 codacy-coverage = "*"
+
+[packages]
+"e1839a8" = {editable = true, path = "."}

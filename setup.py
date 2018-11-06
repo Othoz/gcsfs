@@ -1,22 +1,46 @@
+import os
+
 from setuptools import setup
 from fs_gcsfs.__version__ import __version__
 
+
+here = os.path.abspath(os.path.dirname(__file__))
+
+with open(os.path.join(here, "README.rst"), encoding="utf-8") as f:
+    long_description = "\n" + f.read()
+
+
 if __name__ == "__main__":
     setup(
-        name='fs-gcsfs',
+        name="fs-gcsfs",
+        version=__version__,
         author="Othoz",
         description="A PyFilesystem interface to Google Cloud Storage",
+        long_description=long_description,
+        long_description_content_type="text/x-rst",
         url="https://github.com/Othoz/gcsfs",
+        packages=["fs_gcsfs"],
         license="MIT",
-        version=__version__,
         python_requires=">=3.5",
         install_requires=[
-            "fs~=2.1.0"
+            "fs~=2.1",
+            "google-cloud-storage~=1.12",
         ],
         entry_points={
-            'fs.opener': [
-                'gs = fs_gcsfs.opener:GCSFSOpener',
+            "fs.opener": [
+                "gs = fs_gcsfs.opener:GCSFSOpener",
             ]
         },
-        packages=["fs_gcsfs"],
+        classifiers=(
+            "Intended Audience :: Developers",
+            "License :: OSI Approved :: MIT License",
+            "Operating System :: OS Independent",
+            "Programming Language :: Python :: 3",
+            "Programming Language :: Python :: 3.5",
+            "Programming Language :: Python :: 3.6",
+            "Programming Language :: Python :: 3.7",
+            "Programming Language :: Python :: 3.8",
+            "Programming Language :: Python :: Implementation",
+            "Topic :: Software Development :: Libraries :: Python Modules"
+        ),
     )
