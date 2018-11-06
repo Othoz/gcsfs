@@ -14,8 +14,8 @@ class TestGCSFSPyFileSystem(FSTestCases, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        client = Client()
-        cls.bucket = client.get_bucket(TEST_BUCKET)
+        cls.client = Client()
+        cls.bucket = cls.client.get_bucket(TEST_BUCKET)
         super().setUpClass()
 
     def setUp(self):
@@ -28,7 +28,7 @@ class TestGCSFSPyFileSystem(FSTestCases, unittest.TestCase):
             blob.delete()
 
     def make_fs(self):
-        return GCSFS(bucket_name=TEST_BUCKET, root_path=self.root_path)
+        return GCSFS(bucket_name=TEST_BUCKET, root_path=self.root_path, client=self.client)
 
 
 @pytest.fixture(scope="module")
@@ -42,10 +42,10 @@ def bucket(client):
 
 
 @pytest.fixture(scope="function")
-def tmp_gcsfs(bucket):
+def tmp_gcsfs(bucket, client):
     """Yield a temporary `GCSFS` at a unique 'root-blob' within the test bucket."""
     path = "gcsfs/" + str(uuid.uuid4())
-    fs = GCSFS(bucket_name=bucket.name, root_path=path)
+    fs = GCSFS(bucket_name=bucket.name, root_path=path, client=client)
     yield fs
 
     fs.close()
@@ -55,8 +55,8 @@ def tmp_gcsfs(bucket):
 
 class TestGCSFS:
 
-    def test_scandir_works_on_bucket_as_root_directory(self):
-        gcs_fs = GCSFS(bucket_name=TEST_BUCKET)
+    def test_scandir_works_on_bucket_as_root_directory(self, client):
+        gcs_fs = GCSFS(bucket_name=TEST_BUCKET, client=client)
         path = str(uuid.uuid4())
         with gcs_fs.open(path, "wb") as f:
             f.write(b"")
