@@ -31,7 +31,8 @@ pipelines:
 
       # Note: when running in the 'ci' environment the test.py script generates test results in  XUnit XML format in a subfolder named test-results.
       # Those will be automatically be picked up by Bitbucket Pipelines and used to display information about how many tests have succeeded / failed
-      - ./test unit --environment=ci
+      - pip install -e .
+      - pytest
 
       # Build package to test if the build process works. Must add conda-forge channel
       # because we are drawing in some dependencies from this channel
@@ -68,8 +69,10 @@ pipelines:
         # Run all tests (unit + integration).
         # Note: by specifying the --environment='ci' argument the test script generates test results in  XUnit XML format in a subfolder named test-results.
         # Those will be automatically be picked up by Bitbucket Pipelines and used to display information about how many tests have succeeded / failed
-        - ./test unit --environment=ci
+        # - ./test unit --environment=ci
         # - ./test integration --environment=ci  TODO this fails when there are no integration tests
+        - pip install -e .
+        - pytest
 
         # Build package to test if the build process works. Must add conda-forge channel
         # because we are drawing in some dependencies from this channel
