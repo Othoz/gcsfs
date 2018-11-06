@@ -88,7 +88,7 @@ class TestGCSFS:
         # Manual creation of 'directory marker' with custom content
         key = tmp_gcsfs._path_to_dir_key("foo/")
         blob = bucket.blob(key)
-        content = b"CUSTOM_DIRECOTRY_MARKER_CONTENT"
+        content = b"CUSTOM_DIRECTORY_MARKER_CONTENT"
         blob.upload_from_string(content)
 
         tmp_gcsfs.fix_storage()
