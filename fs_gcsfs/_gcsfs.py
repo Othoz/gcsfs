@@ -103,7 +103,7 @@ class GCSFS(FS):
     def _path_to_key(self, path: str) -> str:
         """Converts an fs path to a GCS key."""
         path = relpath(normpath(path))
-        return self.delimiter.join([self._prefix, path]).lstrip("/").replace("/", self.delimiter)
+        return self.delimiter.join([self._prefix, path]).lstrip("/").replace("/", self.delimiter).rstrip(self.delimiter)
 
     def _path_to_dir_key(self, path: str) -> str:
         """Converts an fs path to a GCS dict key."""
@@ -447,16 +447,16 @@ class GCSFS(FS):
         return _factory(self, path)
 
     def fix_storage(self) -> None:  # TODO test
-        """Walks the entire bucket and makes sure that all intermediate directories are correctly marked with empty blobs.
+        """Walks the entire `root_path` and makes sure that all intermediate directories are correctly marked with empty blobs.
 
         As GCS is no real file system but only a key-value store, there is also no concept of folders. S3FS and GCSFS overcome this limitation by adding
         empty files with the name "<path>/" every time a directory is created, see https://fs-s3fs.readthedocs.io/en/latest/#limitations.
 
-        This may lead to problems when working on data which was not created via GCSFS, e.g. data that was manually copied to the bucket.
+        This may lead to problems when working on data which was not created via GCSFS, e.g. data that was manually copied to the `root_path`.
 
         This utility function fixes all inconsistencies within the filesystem by adding any missing marker blobs.
         """
-        names = [blob.name for blob in self.bucket.list_blobs()]
+        names = [blob.name for blob in self.bucket.list_blobs(prefix=self.root_path)]
         marked_dirs = set()
         all_dirs = set()
 
@@ -466,9 +466,10 @@ class GCSFS(FS):
                 marked_dirs.add(dirname(name))
 
             name = dirname(name)
-            while name != "":
+            while name != self.root_path:
                 all_dirs.add(name)
                 name = dirname(name)
+        all_dirs.add(self.root_path)
 
         unmarked_dirs = all_dirs.difference(marked_dirs)
         print("{} directories in total".format(len(all_dirs)))
