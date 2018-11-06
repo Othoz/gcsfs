@@ -12,26 +12,22 @@ To e.g. write and read a Pandas DataFrame via this module do:
 >     assert df == pd.read_csv(f)
 """
 
+import io
 import itertools
 import logging
-
-from typing import Optional, List, Union, Tuple, Iterator
-
-import io
 import os
 import tempfile
+from typing import Optional, List, Union, Tuple, Iterator
 
+import google
 from fs import ResourceType, errors, tools
 from fs.base import FS
 from fs.info import Info
 from fs.mode import Mode
+from fs.path import basename, dirname, forcedir, normpath, relpath, join
 from fs.permissions import Permissions
 from fs.subfs import SubFS
-from fs.path import basename, dirname, forcedir, normpath, relpath, join
 from fs.time import datetime_to_epoch
-
-import google
-from google.auth.credentials import Credentials
 from google.cloud.storage import Client
 from google.cloud.storage.blob import Blob
 
@@ -48,11 +44,8 @@ class GCSFS(FS):
     Args:
         bucket_name: The GCS bucket name.
         root_path: The root directory within the GCS Bucket
-        project: Google Cloud Platform project. If not passed, falls back to the default inferred from the locally configured gcloud environment.
-        credentials: The OAuth2 Credentials to use for the client. If not passed, falls back to the default inferred from the locally configured gcloud
-            environment.
-        region: Google Cloud Platform region. If not passed, falls back to the default inferred from the locally configured gcloud environment.
         delimiter: The delimiter to separate folders
+        client: A :class:`google.storage.Client` exposing the google storage API.
         strict: When ``True`` (default) GCSFS will follow the PyFilesystem specification exactly. Set to ``False`` to disable validation of destination paths
             which may speed up uploads / downloads.
     """
@@ -72,21 +65,22 @@ class GCSFS(FS):
     def __init__(self,
                  bucket_name: str,
                  root_path: str = None,
-                 project: str = None,
-                 credentials: Credentials = None,
                  delimiter: str = STANDARD_DELIMITER,
+                 client: Client = None,
                  strict: bool = True):
         self._bucket_name = bucket_name
         if not root_path:
             root_path = self.STANDARD_DELIMITER
         self.root_path = root_path
         self._prefix = relpath(normpath(root_path)).rstrip(delimiter)
-        self.project = project
-        self.credentials = credentials
+
         self.delimiter = delimiter
         self.strict = strict
 
-        self.client = Client(project=self.project, credentials=self.credentials)
+        self.client = client
+        if self.client is None:
+            self.client = Client()
+
         self.bucket = self.client.get_bucket(self._bucket_name)
         super(GCSFS, self).__init__()
 
