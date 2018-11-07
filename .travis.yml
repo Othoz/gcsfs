@@ -7,7 +7,6 @@ python:
 
 install:
   - pip install pipenv
-  - python setup.py egg_info
   - pipenv install --dev --three
 
 script:
