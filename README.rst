@@ -1,7 +1,7 @@
 GCSFS
 =====
 
-A Google Cloud Storage (GCS) filesystem for `PyFilesystem2 <https://github.com/PyFilesystem/pyfilesystem2>`_.
+A Python filesystem abstraction of Google Clod Storage (GCS) implemented as a `PyFilesystem2 https://github.com/PyFilesystem/pyfilesystem2`_ extension.
 
 GCSFS lets you interact with `Google Cloud Storage <https://cloud.google.com/storage/>`_ like it wasn't an object store but a regular filesystem.
 As it implements the common PyFilesystem interface, it is easy to exchange the underlying storage mechanism.
@@ -35,7 +35,7 @@ GCSFS can be used like any other PyFilesystem implementation, see the
         f.write("Some text")
 
 
-Alternatively you can an `opener <https://pyfilesystem2.readthedocs.io/en/latest/openers.html>`_ URL:
+Alternatively you can use an `opener <https://pyfilesystem2.readthedocs.io/en/latest/openers.html>`_ URL:
 
 .. code-block:: python
 
@@ -49,9 +49,10 @@ Limitations
 A filesystem built on top of an object store like GCS suffers from the same limitations as the ones
 `mentioned in S3FS <https://fs-s3fs.readthedocs.io/en/latest/#limitations>`_.
 
-GCS does not offer the concept of directories which is why GCSFS (as well as S3FS) will simulate the existence
-of a directory called ``foo`` by adding an empty blob called ``foo/``. Any filesystem content that was no created
-via GCSFS will lack these directory markers which may lead to wrong behaviour in some cases.
+GCS does not offer true directories which is why GCSFS (as well as S3FS) will simulate the existence
+of a directory called ``foo`` by adding an empty blob called ``foo/``. Any filesystem content that was not created
+via GCSFS will lack these directory markers which may lead to wrong behaviour. For example ``gcsfs.isdir("bar")``
+will return ``False`` if the marker blob ``bar/`` does not exist, even though there might exist a blob called ``bar/baz.txt``.
 
 *TODO: Finish and document the "fix storage feature"*
 
