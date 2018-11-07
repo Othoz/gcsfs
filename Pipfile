@@ -10,4 +10,4 @@ pytest-cov = "*"
 codacy-coverage = "*"
 
 [packages]
-"e1839a8" = {editable = true, path = "."}
+# "e1839a8" = {editable = true, path = "."}

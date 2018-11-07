@@ -7,8 +7,14 @@ A Google Cloud Storage (GCS) filesystem for `PyFilesystem2 <https://github.com/P
 .. image:: https://img.shields.io/pypi/v/fs-gcsfs.svg
     :target: https://pypi.org/project/fs-gcsfs/
 
+.. image:: https://img.shields.io/pypi/pyversions/fs-gcsfs.svg
+    :target: https://pypi.org/project/fs-gcsfs/
+
 .. image:: https://travis-ci.org/Othoz/gcsfs.svg?branch=master
     :target: https://travis-ci.org/Othoz/gcsfs
+
+.. image:: https://img.shields.io/github/license/Othoz/gcsfs.svg
+    :target: https://github.com/PyFilesystem/pyfilesystem2/blob/master/LICENSE
 
 
 GCSFS lets you interact with `Google Cloud Storage <https://cloud.google.com/storage/>`_ like it wasn't an object store but a regular filesystem.
