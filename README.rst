@@ -3,6 +3,14 @@ GCSFS
 
 A Google Cloud Storage (GCS) filesystem for `PyFilesystem2 <https://github.com/PyFilesystem/pyfilesystem2>`_.
 
+
+.. image:: https://img.shields.io/pypi/v/fs-gcsfs.svg
+    :target: https://pypi.org/project/fs-gcsfs/
+
+.. image:: https://travis-ci.org/Othoz/gcsfs.svg?branch=master
+    :target: https://travis-ci.org/Othoz/gcsfs
+
+
 GCSFS lets you interact with `Google Cloud Storage <https://cloud.google.com/storage/>`_ like it wasn't an object store but a regular filesystem.
 As it implements the common PyFilesystem interface, it is easy to exchange the underlying storage mechanism.
 You do not need to change any of your code to instead use e.g. `S3FS <https://github.com/pyfilesystem/s3fs>`_ or a simple `in-memory filesystem <https://pyfilesystem2.readthedocs.io/en/latest/reference/memoryfs.html>`_ for testing.
@@ -23,24 +31,45 @@ A conda-forge release is planned for the near future!
 How To Use
 ----------
 
-GCSFS can be used like any other PyFilesystem implementation, see the
-`FS reference <https://pyfilesystem2.readthedocs.io/en/latest/reference/base.html>`_:
+Instantiating a GCS filesystem and working with it is as easy as:
 
 .. code-block:: python
 
-    from fs_gcsfs import GCSFS
-    gcsfs = GCSFS(bucket_name="mybucket")
-
-    with gcsfs.open("foo/bar.txt", "w") as f:
-        f.write("Some text")
+    >>> from fs_gcsfs import GCSFS
+    >>> gcsfs = GCSFS(bucket_name="mybucket")
+    >>> gcsfs.tree()
+    ├── foo
+    │   ├── bar
+    │   │   ├── file1.txt
+    │   │   └── file2.csv
+    │   └── baz
+    │       └── file3.txt
+    └── file4.json
 
 
 Alternatively you can an `opener <https://pyfilesystem2.readthedocs.io/en/latest/openers.html>`_ URL:
 
 .. code-block:: python
 
-    from fs import open_fs
-    gcsfs = open_fs("gs://mybucket")
+    >>> from fs import open_fs
+    >>> gcsfs = open_fs("gs://mybucket")
+    >>> gcsfs.listdir("foo")
+    ["bar", "baz"]
+
+
+Uploading files is as easy as moving them on your local filesystem:
+
+.. code-block:: python
+
+    from fs_gcsfs import GCSFS
+    gcsfs = GCSFS(bucket_name="mybucket")
+
+    with open("image.jpg", "rb") as local_file:
+        with gcsfs.open("image.jpg", "wb") as gcs_file:
+            gcs_file.write(local_file.read())
+
+For more information on the usage of PyFilesystem and its extensions see the official `Reference <https://pyfilesystem2.readthedocs.io/en/latest/reference/base.html>`_
+
 
 
 Limitations

@@ -18,7 +18,7 @@ if __name__ == "__main__":
         description="A Google Cloud Storage filesystem for PyFilesystem2",
         long_description=long_description,
         long_description_content_type="text/x-rst",
-        keywords=["pyfilesystem", "google", "gcs", "google cloud storage"],
+        keywords=["pyfilesystem", "filesystem", "google", "gcs", "google cloud storage"],
         url="https://github.com/Othoz/gcsfs",
         packages=["fs_gcsfs"],
         license="MIT",
