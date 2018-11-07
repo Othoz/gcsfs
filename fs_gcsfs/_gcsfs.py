@@ -1,16 +1,4 @@
-"""A PyFilesystem interface to Google Cloud Storage
-
-See the PyFilesystem documentation here: https://docs.pyfilesystem.org/en/latest/index.html
-
-To e.g. write and read a Pandas DataFrame via this module do:
-> import pandas as pd
-> df = pd.DataFrame(123)
-> fs = open_fs("gs://bucket-name")
-> with fs.open("foo.csv", "w") as f:
->     df.to_csv(f)
-> with fs.open("foo.csv", "r") as f:
->     assert df == pd.read_csv(f)
-"""
+"""A PyFilesystem interface to Google Cloud Storage"""
 
 import io
 import itertools
