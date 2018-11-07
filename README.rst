@@ -1,7 +1,7 @@
 GCSFS
 =====
 
-A Python filesystem abstraction of Google Clod Storage (GCS) implemented as a `PyFilesystem2 https://github.com/PyFilesystem/pyfilesystem2`_ extension.
+A Python filesystem abstraction of Google Clod Storage (GCS) implemented as a `PyFilesystem2 <https://github.com/PyFilesystem/pyfilesystem2>`_ extension.
 
 
 .. image:: https://img.shields.io/pypi/v/fs-gcsfs.svg
