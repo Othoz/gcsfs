@@ -1,7 +1,7 @@
 import os
 
 from setuptools import setup
-from fs_gcsfs.__version__ import __version__
+from fs_gcsfs import __version__, __author__, __license__
 
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -14,17 +14,17 @@ if __name__ == "__main__":
     setup(
         name="fs-gcsfs",
         version=__version__,
-        author="Othoz",
+        author=__author__,
         description="A PyFilesystem interface to Google Cloud Storage",
         long_description=long_description,
         long_description_content_type="text/x-rst",
         url="https://github.com/Othoz/gcsfs",
         packages=["fs_gcsfs"],
-        license="MIT",
+        license=__license__,
         python_requires=">=3.5",
         install_requires=[
-            "fs~=2.1",
-            "google-cloud-storage~=1.12",
+            "fs~=2.0",  # TODO Test this + latest version with travis
+            "google-cloud-storage~=1.0",  # TODO Test this + latest version with travis
         ],
         entry_points={
             "fs.opener": [
