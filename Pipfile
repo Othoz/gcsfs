@@ -7,7 +7,8 @@ name = "pypi"
 flake8 = "*"
 pytest = "*"
 pytest-cov = "*"
+pytest-xdist = "*"
 codacy-coverage = "*"
 
 [packages]
-# "e1839a8" = {editable = true, path = "."}
+"e1839a8" = {editable = true, path = "."}
