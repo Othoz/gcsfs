@@ -1,28 +1,46 @@
+import os
+
 from setuptools import setup
-import versioneer
+from fs_gcsfs import __version__, __author__, __license__
+
+
+here = os.path.abspath(os.path.dirname(__file__))
+
+with open(os.path.join(here, "README.rst"), encoding="utf-8") as f:
+    long_description = "\n" + f.read()
 
 
 if __name__ == "__main__":
     setup(
-        name='fs-gcsfs',
-        author="Othoz",
+        name="fs-gcsfs",
+        version=__version__,
+        author=__author__,
         description="A PyFilesystem interface to Google Cloud Storage",
-        url="http://othoz.com",  # TODO This will become the Github Repo URL
-        license="MIT",
-        version=versioneer.get_version(),
-        cmdclass=versioneer.get_cmdclass(),
+        long_description=long_description,
+        long_description_content_type="text/x-rst",
+        url="https://github.com/Othoz/gcsfs",
+        packages=["fs_gcsfs"],
+        license=__license__,
+        python_requires=">=3.5",
         install_requires=[
-            "fs~=2.1.0"
+            "fs~=2.0",  # TODO Test this + latest version with travis
+            "google-cloud-storage~=1.0",  # TODO Test this + latest version with travis
         ],
         entry_points={
-            'fs.opener': [
-                'gs = fs_gcsfs.opener:GCSFSOpener',
+            "fs.opener": [
+                "gs = fs_gcsfs.opener:GCSFSOpener",
             ]
         },
-        packages=["fs_gcsfs"],
-        # By default setuptools tries to detect automagically if a package can be zipped. However,
-        # a zipped package does seem to not work well with conda - so we force setuptools to not
-        # zip the package
-        zip_safe=False,
-        # Missing: python_requires
+        classifiers=(
+            "Intended Audience :: Developers",
+            "License :: OSI Approved :: MIT License",
+            "Operating System :: OS Independent",
+            "Programming Language :: Python :: 3",
+            "Programming Language :: Python :: 3.5",
+            "Programming Language :: Python :: 3.6",
+            "Programming Language :: Python :: 3.7",
+            "Programming Language :: Python :: 3.8",
+            "Programming Language :: Python :: Implementation",
+            "Topic :: Software Development :: Libraries :: Python Modules"
+        ),
     )

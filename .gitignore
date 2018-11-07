@@ -15,4 +15,7 @@ docs/build
 .pytest_cache/
 
 # development egg
-fs_gcgfs.egg-info/*
+fs_gcsfs.egg-info/*
+
+# Keeping Pipfile.lock out of version control as multiple versions of Python are being targeted
+Pipfile.lock

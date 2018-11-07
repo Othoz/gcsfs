@@ -1,6 +1,5 @@
 from ._gcsfs import GCSFS
-from ._version import get_versions
-__version__ = get_versions()['version']
-del get_versions
+from ._version import __version__
 
-__all__ = ['GCSFS']
+__license__ = "MIT"
+__author__ = "Othoz GmbH"

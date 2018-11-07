@@ -1,0 +1,13 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[dev-packages]
+flake8 = "*"
+pytest = "*"
+pytest-cov = "*"
+codacy-coverage = "*"
+
+[packages]
+"e1839a8" = {editable = true, path = "."}
