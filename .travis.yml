@@ -1,5 +1,6 @@
 sudo: false
 language: python
+
 python:
   - "3.5"
   - "3.6"
@@ -11,6 +12,14 @@ install:
 script:
   - flake8
   # - pytest --cov=fs_gcsfs --cov-branch --cov-report=xml  TODO: Find a way to run the tests without accessing an actual bucket
+
+deploy:
+  provider: pypi
+  user: othoz
+  password:
+    secure: Mvb2uiJg8X1l/tU6ZHE/uapvHBOXZMBuvSTQXNLu8M8h8UtRYy4hMNKDeCeE+pE5jykMlMdH4dAxieslSKVkMoXJnEeKEQIzPPuc7hxJHCF+KDPMVR7iNCS/QsrMjgeM4gK7mLesCz5GEPjczx7K71BXcHnJi0/Ims4MuHlLf0h+gzOOd+N+n/qCbMA5+tlHlsEg/uM5zYFlcv08MUtgpcPlyTsmmeQicQ6gGyjJOQ/BEZrYkG9dyE8PUHpZa1nIaka39gX1mT3UA0NmZmNtuqvlOHBK79sR4SYVK19cgULAjMs47uOsb8p2oYpi8IyKt9OozALtwnJhBisqnHusAFasIrhiUv+CZgAdMcfeCzSaFFTL9gCPGkrBcJbNrsE8SaRzGfQrTRXUbtLh5gbPFhMIrcDQxEw0PGr7JIAGGye/Hh6y+S8pfe9hF9P1vkO0ttA94ug7FPnA1BIA9yMvCSQ3/3eGpLUjTkg7p+c7jtGM7qYizvExCnEuaDSrpG5BJ11KrzRdEMkKbSk6dE3dGYnMkX5LquEhKaO1rkmK0MDJpuxlmMdTLSgHa48bZOZpxWXcJUa/nmoVq2jyO4USycDIe5IAt/iOGlroj6rRsIm57M9tWbo2HnjuFY4/GI2hjAxFmQucxHk9az+NguWexl27TimTxaY26duKbJ6Ss9Y=
+  on:
+    tags: true
 
 after_success:
   - python-codacy-coverage -r coverage.xml

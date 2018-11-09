@@ -1,3 +1,3 @@
 from ._gcsfs import GCSFS
 
-__all__ = ["GCSFS"]
+__version__ = "0.1.6"
