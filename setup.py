@@ -16,7 +16,7 @@ if __name__ == "__main__":
         name="fs-gcsfs",
         version=version_namespace["__version__"],
         author="Othoz GmbH",
-        author_email="wiesner@othoz.com",  # TODO
+        author_email="wiesner@othoz.com",
         description="A PyFilesystem interface to Google Cloud Storage",
         long_description=long_description,
         long_description_content_type="text/x-rst",
