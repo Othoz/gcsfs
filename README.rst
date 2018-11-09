@@ -1,7 +1,7 @@
 GCSFS
 =====
 
-A Python filesystem abstraction of Google Clod Storage (GCS) implemented as a `PyFilesystem2 <https://github.com/PyFilesystem/pyfilesystem2>`_ extension.
+A Python filesystem abstraction of Google Cloud Storage (GCS) implemented as a `PyFilesystem2 <https://github.com/PyFilesystem/pyfilesystem2>`_ extension.
 
 
 .. image:: https://img.shields.io/pypi/v/fs-gcsfs.svg
@@ -13,6 +13,12 @@ A Python filesystem abstraction of Google Clod Storage (GCS) implemented as a `P
 .. image:: https://travis-ci.org/Othoz/gcsfs.svg?branch=master
     :target: https://travis-ci.org/Othoz/gcsfs
 
+.. image:: https://api.codacy.com/project/badge/Coverage/6377a6e321cd4ccf94dfd6f09456d9ce
+    :target: https://www.codacy.com/app/Othoz/gcsfs?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Othoz/gcsfs&amp;utm_campaign=Badge_Coverage
+
+.. image:: https://api.codacy.com/project/badge/Grade/6377a6e321cd4ccf94dfd6f09456d9ce
+    :target: https://www.codacy.com/app/Othoz/gcsfs?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Othoz/gcsfs&amp;utm_campaign=Badge_Grade
+
 .. image:: https://img.shields.io/github/license/Othoz/gcsfs.svg
     :target: https://github.com/PyFilesystem/pyfilesystem2/blob/master/LICENSE
 
@@ -22,6 +28,14 @@ As it implements the common PyFilesystem interface, it is easy to exchange the u
 You do not need to change any of your code to instead use e.g. `S3FS <https://github.com/pyfilesystem/s3fs>`_ or a simple `in-memory filesystem <https://pyfilesystem2.readthedocs.io/en/latest/reference/memoryfs.html>`_ for testing.
 
 For a full reference on all the PyFilesystem possibilities, take a look at the `PyFilesystem Docs <https://pyfilesystem2.readthedocs.io/en/latest/index.html>`_!
+
+
+Documentation
+-------------
+
+- `GCSFS Documentation <http://fs-gcsfs.readthedocs.io/en/latest/>`_
+- `PyFilesystem Wiki <https://www.pyfilesystem.org>`_
+- `PyFilesystem Reference <https://docs.pyfilesystem.org/en/latest/reference/base.html>`_
 
 
 Installing
@@ -77,21 +91,6 @@ Uploading files is as easy as moving them on your local filesystem:
 For more information on the usage of PyFilesystem and its extensions see the official `Reference <https://pyfilesystem2.readthedocs.io/en/latest/reference/base.html>`_
 
 
-
-Limitations
------------
-
-A filesystem built on top of an object store like GCS suffers from the same limitations as the ones
-`mentioned in S3FS <https://fs-s3fs.readthedocs.io/en/latest/#limitations>`_.
-
-GCS does not offer true directories which is why GCSFS (as well as S3FS) will simulate the existence
-of a directory called ``foo`` by adding an empty blob called ``foo/``. Any filesystem content that was not created
-via GCSFS will lack these directory markers which may lead to wrong behaviour. For example ``gcsfs.isdir("bar")``
-will return ``False`` if the marker blob ``bar/`` does not exist, even though there might exist a blob called ``bar/baz.txt``.
-
-*TODO: Finish and document the "fix storage feature"*
-
-
 Development
 -----------
 
@@ -110,12 +109,3 @@ Credits
 -------
 
 Credits go to `S3FS <https://github.com/PyFilesystem/s3fs>`_ which was the main source of inspiration and shares a lot of code with GCSFS.
-
-
-Documentation
--------------
-
--  `PyFilesystem Wiki <https://www.pyfilesystem.org>`_
--  `PyFilesystem Reference <https://docs.pyfilesystem.org/en/latest/reference/base.html>`_
-
-.. TODO `GCS Reference <http://fs-gcsfs.readthedocs.io/en/latest/>`_
