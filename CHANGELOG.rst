@@ -23,6 +23,9 @@ Unreleased
 Changed
 '''''''
 - Open-sourced GCSFS by moving it to GitHub
+- Removed ``project`` and ``credentials`` properties from ``GCSFS``.
+  Instead, one can now optionally pass a ``client`` of type
+  `google.cloud.storage.Client <https://googleapis.github.io/google-cloud-python/latest/storage/client.html#module-google.cloud.storage.client>`_.
 
 
 0.1.6 - 30.10.2018

@@ -108,4 +108,4 @@ run all tests via::
 Credits
 -------
 
-Credits go to `S3FS <https://github.com/PyFilesystem/s3fs>`_ which was the main source of inspiration and shares a lot of code with GCSFS.
+Credits go to `S3FS <https://github.com/PyFilesystem/s3fs>`__ which was the main source of inspiration and shares a lot of code with GCSFS.
