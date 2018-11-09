@@ -20,6 +20,10 @@ Possible types of changes are:
 Unreleased
 ----------
 
+Changed
+'''''''
+- Open-sourced GCSFS by moving it to GitHub
+
 
 0.1.6 - 30.10.2018
 ------------------

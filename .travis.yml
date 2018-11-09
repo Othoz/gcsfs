@@ -1,0 +1,16 @@
+sudo: false
+language: python
+python:
+  - "3.5"
+  - "3.6"
+
+install:
+  - pip install pipenv
+  - pipenv install --dev --three
+
+script:
+  - flake8
+  # - pytest --cov=fs_gcsfs --cov-branch --cov-report=xml  TODO: Find a way to run the tests without accessing an actual bucket
+
+after_success:
+  - python-codacy-coverage -r coverage.xml
