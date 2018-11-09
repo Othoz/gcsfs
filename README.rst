@@ -30,14 +30,6 @@ You do not need to change any of your code to instead use e.g. `S3FS <https://gi
 For a full reference on all the PyFilesystem possibilities, take a look at the `PyFilesystem Docs <https://pyfilesystem2.readthedocs.io/en/latest/index.html>`_!
 
 
-Documentation
--------------
-
-- `GCSFS Documentation <http://fs-gcsfs.readthedocs.io/en/latest/>`_
-- `PyFilesystem Wiki <https://www.pyfilesystem.org>`_
-- `PyFilesystem Reference <https://docs.pyfilesystem.org/en/latest/reference/base.html>`_
-
-
 Installing
 ----------
 
@@ -91,6 +83,21 @@ Uploading files is as easy as moving them on your local filesystem:
 For more information on the usage of PyFilesystem and its extensions see the official `Reference <https://pyfilesystem2.readthedocs.io/en/latest/reference/base.html>`_
 
 
+
+Limitations
+-----------
+
+A filesystem built on top of an object store like GCS suffers from the same limitations as the ones
+`mentioned in S3FS <https://fs-s3fs.readthedocs.io/en/latest/#limitations>`_.
+
+GCS does not offer true directories which is why GCSFS (as well as S3FS) will simulate the existence
+of a directory called ``foo`` by adding an empty blob called ``foo/``. Any filesystem content that was not created
+via GCSFS will lack these directory markers which may lead to wrong behaviour. For example ``gcsfs.isdir("bar")``
+will return ``False`` if the marker blob ``bar/`` does not exist, even though there might exist a blob called ``bar/baz.txt``.
+
+*TODO: Finish and document the "fix storage feature"*
+
+
 Development
 -----------
 
@@ -108,4 +115,13 @@ run all tests via::
 Credits
 -------
 
-Credits go to `S3FS <https://github.com/PyFilesystem/s3fs>`__ which was the main source of inspiration and shares a lot of code with GCSFS.
+Credits go to `S3FS <https://github.com/PyFilesystem/s3fs>`_ which was the main source of inspiration and shares a lot of code with GCSFS.
+
+
+Documentation
+-------------
+
+-  `PyFilesystem Wiki <https://www.pyfilesystem.org>`_
+-  `PyFilesystem Reference <https://docs.pyfilesystem.org/en/latest/reference/base.html>`_
+
+.. TODO `GCS Reference <http://fs-gcsfs.readthedocs.io/en/latest/>`_
