@@ -1,6 +1,9 @@
 import os
 from setuptools import setup
 
+version_namespace = {}
+with open("fs_gcsfs/_version.py") as f:
+    exec(f.read(), version_namespace)  # nosec  # pylint: disable=exec-used
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -11,8 +14,9 @@ with open(os.path.join(here, "README.rst"), encoding="utf-8") as f:
 if __name__ == "__main__":
     setup(
         name="fs-gcsfs",
-        version="0.1.6",
+        version=version_namespace["__version__"],
         author="Othoz GmbH",
+        author_email="wiesner@othoz.com",
         description="A PyFilesystem interface to Google Cloud Storage",
         long_description=long_description,
         long_description_content_type="text/x-rst",
@@ -30,7 +34,7 @@ if __name__ == "__main__":
                 "gs = fs_gcsfs.opener:GCSFSOpener",
             ]
         },
-        classifiers=(
+        classifiers=[
             "Development Status :: 4 - Beta",
             "Intended Audience :: Developers",
             "License :: OSI Approved :: MIT License",
@@ -42,5 +46,5 @@ if __name__ == "__main__":
             "Programming Language :: Python :: 3.7",
             "Programming Language :: Python :: Implementation",
             "Topic :: System :: Filesystems",
-        ),
+        ],
     )

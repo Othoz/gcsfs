@@ -1,7 +1,7 @@
 GCSFS
 =====
 
-A Python filesystem abstraction of Google Clod Storage (GCS) implemented as a `PyFilesystem2 <https://github.com/PyFilesystem/pyfilesystem2>`_ extension.
+A Python filesystem abstraction of Google Cloud Storage (GCS) implemented as a `PyFilesystem2 <https://github.com/PyFilesystem/pyfilesystem2>`_ extension.
 
 
 .. image:: https://img.shields.io/pypi/v/fs-gcsfs.svg
@@ -12,6 +12,12 @@ A Python filesystem abstraction of Google Clod Storage (GCS) implemented as a `P
 
 .. image:: https://travis-ci.org/Othoz/gcsfs.svg?branch=master
     :target: https://travis-ci.org/Othoz/gcsfs
+
+.. image:: https://api.codacy.com/project/badge/Coverage/6377a6e321cd4ccf94dfd6f09456d9ce
+    :target: https://www.codacy.com/app/Othoz/gcsfs?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Othoz/gcsfs&amp;utm_campaign=Badge_Coverage
+
+.. image:: https://api.codacy.com/project/badge/Grade/6377a6e321cd4ccf94dfd6f09456d9ce
+    :target: https://www.codacy.com/app/Othoz/gcsfs?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Othoz/gcsfs&amp;utm_campaign=Badge_Grade
 
 .. image:: https://img.shields.io/github/license/Othoz/gcsfs.svg
     :target: https://github.com/PyFilesystem/pyfilesystem2/blob/master/LICENSE

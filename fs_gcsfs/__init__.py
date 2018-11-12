@@ -1,3 +1,4 @@
-from ._gcsfs import GCSFS
+# flake8: noqa
 
-__all__ = ["GCSFS"]
+from ._gcsfs import GCSFS
+from ._version import __version__

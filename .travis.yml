@@ -1,8 +1,8 @@
 sudo: false
 language: python
+
 python:
   - "3.5"
-  - "3.6"
 
 install:
   - pip install pipenv
@@ -11,6 +11,14 @@ install:
 script:
   - flake8
   # - pytest --cov=fs_gcsfs --cov-branch --cov-report=xml  TODO: Find a way to run the tests without accessing an actual bucket
+
+deploy:
+  provider: pypi
+  user: othoz
+  password:
+    secure: cjuKT6NBmpvaMUQBHNASnP/J4YQoHtBU3OoW8rmvPbWz/fsllaXYv0IZSv+A2Y3pTa7um/jGDezn7s37hPpmvBKCF5UDqEjkEd+rTEdXgZMB0KY2JU2xSfVeyTH0CxQWQWpL6BXs1+lCtJv50ckNGm9WjhkhQSub+UpvAg3CkFlb8t+aZWXKqF7+PSW+pCtQbzcXJqBfNOYa0gB/F4IKj7O52zWlAiO609fvF0vvC+eyY1wB2IKejvKedRes9pxq04r9YatsXP3ynFesfrLEbccz7NEb6Ek0fNx0Cfjnci8vsnRV2SST/gzacp4n6J8e/3l07ZG4LwFbIq1U3D/29ZCZeNA/ahD/wzu3hIqAmYcND8hGyh5kYbWGDRqguFzBGWvsJDxXc6dHFb4dQu7j3Iol4NYy2TZSPvnGnMYX9yqM9sAS3QU12aJBuzl0ItY1s978orI9edLJJmEHVx2hypOtGNZmuTFxfTb1yVY0ivzEOFDOaFMo9ntn+wbf+nCbdjfbP0IlYsTxdt6Fx/6oDdA5kgEczh06k9KxSGutXQMNOT9sjH98Rrkg8Teyhn9Ky7Rn4SXtEjp1KFmDSB/luXyKdG4oAhLa+yeEdTa3mpwqtL+W49BT453WZ3nGsuqqhFCtChIRg98IWLztX+dPzRa7PxxN2ms3BscablB7JjM=
+  on:
+    tags: true
 
 after_success:
   - python-codacy-coverage -r coverage.xml
