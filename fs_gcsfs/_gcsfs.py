@@ -186,14 +186,12 @@ class GCSFS(FS):
         dir_key = self._path_to_dir_key(_path)
 
         if dir_key == "/":
-            # In case we want to list the root directory, no prefix is necessary
-            prefix = ""
-        else:
-            prefix = dir_key
-        prefix_len = len(prefix)
+            # In case we want to list the bucket, dir_key needs to be the empty string
+            dir_key = ""
+        prefix_len = len(dir_key)
 
         # Build set of root level directories
-        page_iterator = self.bucket.list_blobs(prefix=prefix, delimiter="/")
+        page_iterator = self.bucket.list_blobs(prefix=dir_key, delimiter="/")
         prefixes = set()
         for page in page_iterator.pages:
             prefixes.update(page.prefixes)

@@ -55,7 +55,6 @@ def tmp_gcsfs(bucket, client):
 
 class TestGCSFS:
 
-    @pytest.mark.skip("There is still a bug in the scandir implementaion. Root level blobs (which are not directories) are not listed")
     def test_scandir_works_on_bucket_as_root_directory(self, client):
         gcs_fs = GCSFS(bucket_name=TEST_BUCKET, client=client)
         path = str(uuid.uuid4())
