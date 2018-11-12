@@ -3,7 +3,7 @@ from setuptools import setup
 
 version_namespace = {}
 with open("fs_gcsfs/_version.py") as f:
-    exec(f.read(), version_namespace)  # nosec
+    exec(f.read(), version_namespace)  # nosec  # pylint: disable=exec-used
 
 here = os.path.abspath(os.path.dirname(__file__))
 
