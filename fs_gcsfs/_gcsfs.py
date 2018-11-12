@@ -35,7 +35,7 @@ class GCSFS(FS):
         delimiter: The delimiter to separate folders
         client: A :class:`google.storage.Client` exposing the google storage API.
         strict: When ``True`` (default) GCSFS will follow the PyFilesystem specification exactly. Set to ``False`` to disable validation of destination paths
-            which may speed up uploads / downloads.
+                which may speed up uploads / downloads.
     """
 
     _meta = {
@@ -433,14 +433,10 @@ class GCSFS(FS):
         return _factory(self, path)
 
     def fix_storage(self) -> None:  # TODO test
-        """Walks the entire `root_path` and makes sure that all intermediate directories are correctly marked with empty blobs.
+        """Utility function that walks the entire `root_path` and makes sure that all intermediate directories are correctly marked with empty blobs.
 
         As GCS is no real file system but only a key-value store, there is also no concept of folders. S3FS and GCSFS overcome this limitation by adding
-        empty files with the name "<path>/" every time a directory is created, see https://fs-s3fs.readthedocs.io/en/latest/#limitations.
-
-        This may lead to problems when working on data which was not created via GCSFS, e.g. data that was manually copied to the `root_path`.
-
-        This utility function fixes all inconsistencies within the filesystem by adding any missing marker blobs.
+        empty files with the name "<path>/" every time a directory is created, see https://fs-gcsfs.readthedocs.io/en/latest/#limitations.
         """
         names = [blob.name for blob in self.bucket.list_blobs(prefix=self.root_path)]
         marked_dirs = set()
