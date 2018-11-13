@@ -44,8 +44,6 @@ release = version_namespace["__version__"]
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon',  # must be loaded before 'sphinx_autodoc_typehints' according to https://github.com/agronholm/sphinx-autodoc-typehints
-    'sphinx_autodoc_typehints',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
