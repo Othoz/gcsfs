@@ -14,14 +14,11 @@ before_install:
       curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-218.0.0-linux-x86_64.tar.gz > google-cloud-sdk.tar.gz;
       tar -xzf google-cloud-sdk.tar.gz;
       ./google-cloud-sdk/install.sh --usage-reporting=false --command-completion=false --path-update=false;
-      ./google-cloud-sdk/bin/gcloud version;
-      gcloud version;
-      source ./google-cloud-sdk/path.bash.inc;
-      gcloud version;
     fi
-  - echo ${GCP_DEPLOYMENT_SERVICE_ACCOUNT_KEY_FILE} > $HOME/client-secret.json
+  - source ./google-cloud-sdk/path.bash.inc;
+  - echo ${GCP_DEPLOYMENT_SERVICE_ACCOUNT_KEY_FILE} > ./client-secret.json
   # - export GOOGLE_APPLICATION_CREDENTIALS=/root/client-secret.json
-  - gcloud auth activate-service-account --key-file $HOME/client-secret.json
+  - gcloud auth activate-service-account --key-file ./client-secret.json
   - gcloud config set project ${GCP_PROJECT_ID}
 
 install:
