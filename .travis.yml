@@ -14,7 +14,7 @@ before_install:
       # ./google-cloud-sdk/bin/gcloud version;
       # gcloud version;
   - if [ ! -d $HOME/google-cloud-sdk/bin ];
-      echo "jo"
+      echo "jo";
     fi
   - if [ ! -d $HOME/google-cloud-sdk/bin ];
       curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-218.0.0-linux-x86_64.tar.gz > sdk.tar;
