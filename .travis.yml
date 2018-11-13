@@ -14,13 +14,11 @@ before_install:
       tar -xzf google-cloud-sdk.tar.gz --directory $HOME;
       $HOME/google-cloud-sdk/install.sh --usage-reporting=false --command-completion=false --path-update=false;
     fi
-  - ls $HOME
-  - ls $HOME/google-cloud-sdk
-  - source $HOME/google-cloud-sdk/path.bash.inc;
-  - openssl aes-256-cbc -K $encrypted_c81453105ad2_key -iv $encrypted_c81453105ad2_iv -in fs_gcsfs/tests/resources/gcs-test-key.json.enc -out $HOME/gcs-test-key.json -d
-  - # gcloud auth activate-service-account --key-file ./gcs-test-key.json
-  - # gcloud config set project ${GCP_PROJECT_ID}
-  - export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcs-test-key.json
+  # - source $HOME/google-cloud-sdk/path.bash.inc;
+  - openssl aes-256-cbc -K $encrypted_c81453105ad2_key -iv $encrypted_c81453105ad2_iv -in .travis/service-account-key.json.enc -out $HOME/service-account-key.json -d
+  # - gcloud auth activate-service-account --key-file ./service-account-key.json
+  # - gcloud config set project ${GCP_PROJECT_ID}
+  - export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account-key.json
 
 install:
   - pip install pipenv
