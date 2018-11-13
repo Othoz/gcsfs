@@ -7,7 +7,7 @@ from google.cloud.storage import Client
 
 from fs_gcsfs import GCSFS
 
-TEST_BUCKET = "othoz-test"
+TEST_BUCKET = "othoz-gcsfs-tests"
 
 
 class TestGCSFSPyFileSystem(FSTestCases, unittest.TestCase):
