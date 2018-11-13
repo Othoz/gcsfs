@@ -16,7 +16,9 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('../'))
 
-from fs_gcsfs import __version__
+version_namespace = {}
+with open("fs_gcsfs/_version.py") as f:
+    exec(f.read(), version_namespace)  # nosec  # pylint: disable=exec-used
 
 
 # -- Project information -----------------------------------------------------
@@ -26,9 +28,9 @@ copyright = '2018, Othoz GmbH'
 author = 'Othoz GmbH'
 
 # The short X.Y version
-version = __version__
+version = version_namespace["__version__"]
 # The full version, including alpha/beta/rc tags
-release = __version__
+release = version_namespace["__version__"]
 
 
 # -- General configuration ---------------------------------------------------
