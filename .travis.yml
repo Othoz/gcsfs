@@ -9,17 +9,17 @@ cache:
   - $HOME/google-cloud-sdk
 
 before_install:
-  - >
-      if [ ! -d $HOME/google-cloud-sdk/bin ];
-        # then rm -rf $HOME/google-cloud-sdk;
-        curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-218.0.0-linux-x86_64.tar.gz > sdk.tar;
-        tar -xzf rebol.tar.gz;
-        ls;
-        ./google-cloud-sdk/install.sh;
-        ./google-cloud-sdk/bin/gcloud version;
-        gcloud version;
-        "google-cloud-sdk-218.0.0-linux-x86_64.tar.gz"
-      fi
+  - |
+    if [ ! -d $HOME/google-cloud-sdk/bin ];
+      # then rm -rf $HOME/google-cloud-sdk;
+      curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-218.0.0-linux-x86_64.tar.gz > sdk.tar;
+      tar -xzf rebol.tar.gz;
+      ls;
+      ./google-cloud-sdk/install.sh;
+      ./google-cloud-sdk/bin/gcloud version;
+      gcloud version;
+      "google-cloud-sdk-218.0.0-linux-x86_64.tar.gz"
+    fi
   - echo ${GCP_DEPLOYMENT_SERVICE_ACCOUNT_KEY_FILE} > /root/client-secret.json
   - export GOOGLE_APPLICATION_CREDENTIALS=/root/client-secret.json
   - gcloud auth activate-service-account --key-file /root/client-secret.json
