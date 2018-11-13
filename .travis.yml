@@ -11,13 +11,10 @@ cache:
 before_install:
       # then rm -rf $HOME/google-cloud-sdk;
   - if [ ! -d $HOME/google-cloud-sdk/bin ]; then
-      echo "jo";
-    fi
-  - if [ ! -d $HOME/google-cloud-sdk/bin ]; then
       curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-218.0.0-linux-x86_64.tar.gz > google-cloud-sdk.tar.gz;
       tar -xzf google-cloud-sdk.tar.gz;
       ls;
-      ./google-cloud-sdk/install.sh;
+      ./google-cloud-sdk/install.sh --help;
       ./google-cloud-sdk/bin/gcloud version;
       gcloud version;
     fi
