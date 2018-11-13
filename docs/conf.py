@@ -12,13 +12,10 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+from fs_gcsfs import __version__
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../'))
-
-version_namespace = {}
-with open("../fs_gcsfs/_version.py") as f:
-    exec(f.read(), version_namespace)  # nosec  # pylint: disable=exec-used
 
 
 # -- Project information -----------------------------------------------------
@@ -28,9 +25,9 @@ copyright = '2018, Othoz GmbH'
 author = 'Othoz GmbH'
 
 # The short X.Y version
-version = version_namespace["__version__"]
+version = __version__
 # The full version, including alpha/beta/rc tags
-release = version_namespace["__version__"]
+release = __version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -44,6 +41,11 @@ release = version_namespace["__version__"]
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    # Typehints are currently deactivated as this would require to maintain a separate requirements.txt for readthedocs.
+    # readthedocs will most likely support Pipfiles in the future, then we can reactivate this feature
+    # 'sphinx.ext.napoleon',  # must be loaded before 'sphinx_autodoc_typehints' according to https://github.com/agronholm/sphinx-autodoc-typehints
+    # 'sphinx_autodoc_typehints',
+
 ]
 
 # Add any paths that contain templates here, relative to this directory.
