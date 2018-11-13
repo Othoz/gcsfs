@@ -10,10 +10,9 @@ cache:
 
 before_install:
   - openssl aes-256-cbc -K $encrypted_c81453105ad2_key -iv $encrypted_c81453105ad2_iv -in fs_gcsfs/tests/gcs-test-key.json.enc -out gcs-test-key.json -d
-  - head gcs-test-key.json
   - if [ ! -d $HOME/google-cloud-sdk ]; then
-      curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-218.0.0-linux-x86_64.tar.gz > $HOME/google-cloud-sdk.tar.gz;
-      tar -xzf $HOME/google-cloud-sdk.tar.gz -C $HOME;
+      curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-218.0.0-linux-x86_64.tar.gz > google-cloud-sdk.tar.gz;
+      tar -xzf google-cloud-sdk.tar.gz --directory $HOME;
       $HOME/google-cloud-sdk/install.sh --usage-reporting=false --command-completion=false --path-update=false;
     fi
   - ls $HOME
