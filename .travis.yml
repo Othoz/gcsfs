@@ -4,17 +4,26 @@ language: python
 python:
   - "3.5"
 
+env:
+  # GCP_PROJECT_ID
+  - secure: "fxL9rEDB3ys8SHnkLBCp+oGlKOr4Q5VR26ZeRDOILd1k7KKGvZqt6j1l6r4Z/5PtYtyc+jWHVbZ0XaMdeOIJyyhQylwRBIKYoQfu3IlEw41FGAcVTw/w3CBYojBHOoxRmsqk2FvVzTJmpBbSz8YRZQ7m3p/WP6obAKpaosflWVvj4cOaUMKCEAXOsCxSaxoFf+ZcYmG3TCn6xmMvFzqssCtKFEXZmeh5aIbhJAlwqyt30kwuvACsJoqCRUvsL5zA5NWud5uZhXs9u+WKr7j6N+cJ6DJ5FBLVkmsh1kVsy8aT/6dTnkCTfnT7PaNgJxR9Z0cUl6tqXZ5lQnH8OtcHDf+I3MO+vfAVNxRhjjhHLyc/yvSuOj48K1siKDc6q7mNLj0hOcUKk+Hw+dKkU82nyNygV2huTwd7Z2DQiLchtzuZ7J+zEb+1pgw8rbFhBs3nKRPwlHIQEOVQ4hN78R58Yc22oceCQA3U3LUIHlxe+CDJl0zx0e4ulOvnoP3SlJwySUzO6lOzb73bEIE0qORH5mAXoV2t86LFHiUvtasd1+K2g+/kiJMB8O2yaTC/KArAv/EcEVXeBV1FA10sT81InDxymfc4Kw5bguo9vq805poN8kpAtBZ/61TjB5XwLeU3gn9C0Ze/7Y/qCiiwTSl/cftnk9znb8zCNFN4Quy+AS0="
+  # CODACY_PROJECT_TOKEN
+  - secure: "bPKyJhKopXCDDFgRKYOjXJOXO0xYC+9524HT6Ub+WKpmDgIStTRxDN2/AZacyJtpSFGAartryRM5aGxnxHiPxzOZtEaNOSQIdaTmvST/IpCkiRcANnKDP/nqEmZMq4q8qPQOHor5xzYbsUQLsxQU3cRnmhXhZpwlEjV+TKB5S+alpBN4vRu3fxuq9XjjaiJn5iPwTdwdvMHdjYY7szFgrEr7yS/B63zqebzU+LLz3m9N7LYeuMyVw8Ye8jmJBbvp57HnZDkssTzjbQSaskXrwYenNyMp2gMRacgrocbfLoiMKlVvdGjunV/uZiYoYmML+Yp+LvRd00tesSqusEHLqN5Xc6qjBW6OdSU2rfFLvDPckwelxI6rhPwS/jEOgsHWzNgIsX+g5OSKICa3I3fBelb0dRkGytB9PxJybO5hYvACKDtQ7QVSt5F+VxQ1aSgMp7ZA7iNih0ZJrcNYjmShBGh6xIKELder7bACWUBQsISlaXoyXVKAuDRSP9MpDyN9qrAYVbg41WeYCBgoRInNb4jd0XV09k5e1FjgZwYYHg9wTWhJWzZTmktw2qJaAyGLj5GTqQCbHOKJ2iEDikOVoIdo3FHVRpxuvpbe6Au4pPw2bf33DmtlZZVEg9K+gJd/ecl/SGqzmN/AbRcpp4eVruweZv6RPCwKkDBNgBtocgk="
+
 cache:
   directories:
   - $HOME/google-cloud-sdk
 
 before_install:
   - openssl aes-256-cbc -K $encrypted_c81453105ad2_key -iv $encrypted_c81453105ad2_iv -in fs_gcsfs/tests/gcs-test-key.json.enc -out gcs-test-key.json -d
+  - ls
   - if [ ! -d $HOME/google-cloud-sdk ]; then
       curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-218.0.0-linux-x86_64.tar.gz > google-cloud-sdk.tar.gz;
       tar -xzf google-cloud-sdk.tar.gz;
       ./google-cloud-sdk/install.sh --usage-reporting=false --command-completion=false --path-update=false;
     fi
+  - ls
+  - ls google-cloud-sdk
   - source ./google-cloud-sdk/path.bash.inc;
   - gcloud auth activate-service-account --key-file ./gcs-test-key.json
   - gcloud config set project ${GCP_PROJECT_ID}
@@ -31,7 +40,7 @@ deploy:
   provider: pypi
   user: othoz
   password:
-    secure: cjuKT6NBmpvaMUQBHNASnP/J4YQoHtBU3OoW8rmvPbWz/fsllaXYv0IZSv+A2Y3pTa7um/jGDezn7s37hPpmvBKCF5UDqEjkEd+rTEdXgZMB0KY2JU2xSfVeyTH0CxQWQWpL6BXs1+lCtJv50ckNGm9WjhkhQSub+UpvAg3CkFlb8t+aZWXKqF7+PSW+pCtQbzcXJqBfNOYa0gB/F4IKj7O52zWlAiO609fvF0vvC+eyY1wB2IKejvKedRes9pxq04r9YatsXP3ynFesfrLEbccz7NEb6Ek0fNx0Cfjnci8vsnRV2SST/gzacp4n6J8e/3l07ZG4LwFbIq1U3D/29ZCZeNA/ahD/wzu3hIqAmYcND8hGyh5kYbWGDRqguFzBGWvsJDxXc6dHFb4dQu7j3Iol4NYy2TZSPvnGnMYX9yqM9sAS3QU12aJBuzl0ItY1s978orI9edLJJmEHVx2hypOtGNZmuTFxfTb1yVY0ivzEOFDOaFMo9ntn+wbf+nCbdjfbP0IlYsTxdt6Fx/6oDdA5kgEczh06k9KxSGutXQMNOT9sjH98Rrkg8Teyhn9Ky7Rn4SXtEjp1KFmDSB/luXyKdG4oAhLa+yeEdTa3mpwqtL+W49BT453WZ3nGsuqqhFCtChIRg98IWLztX+dPzRa7PxxN2ms3BscablB7JjM=
+    secure: "cjuKT6NBmpvaMUQBHNASnP/J4YQoHtBU3OoW8rmvPbWz/fsllaXYv0IZSv+A2Y3pTa7um/jGDezn7s37hPpmvBKCF5UDqEjkEd+rTEdXgZMB0KY2JU2xSfVeyTH0CxQWQWpL6BXs1+lCtJv50ckNGm9WjhkhQSub+UpvAg3CkFlb8t+aZWXKqF7+PSW+pCtQbzcXJqBfNOYa0gB/F4IKj7O52zWlAiO609fvF0vvC+eyY1wB2IKejvKedRes9pxq04r9YatsXP3ynFesfrLEbccz7NEb6Ek0fNx0Cfjnci8vsnRV2SST/gzacp4n6J8e/3l07ZG4LwFbIq1U3D/29ZCZeNA/ahD/wzu3hIqAmYcND8hGyh5kYbWGDRqguFzBGWvsJDxXc6dHFb4dQu7j3Iol4NYy2TZSPvnGnMYX9yqM9sAS3QU12aJBuzl0ItY1s978orI9edLJJmEHVx2hypOtGNZmuTFxfTb1yVY0ivzEOFDOaFMo9ntn+wbf+nCbdjfbP0IlYsTxdt6Fx/6oDdA5kgEczh06k9KxSGutXQMNOT9sjH98Rrkg8Teyhn9Ky7Rn4SXtEjp1KFmDSB/luXyKdG4oAhLa+yeEdTa3mpwqtL+W49BT453WZ3nGsuqqhFCtChIRg98IWLztX+dPzRa7PxxN2ms3BscablB7JjM="
   on:
     tags: true
 
