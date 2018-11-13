@@ -13,10 +13,10 @@ before_install:
       # ./google-cloud-sdk/install.sh;
       # ./google-cloud-sdk/bin/gcloud version;
       # gcloud version;
-  - if [ ! -d $HOME/google-cloud-sdk/bin ];
+  - if [ ! -d $HOME/google-cloud-sdk/bin ]; then
       echo "jo";
     fi
-  - if [ ! -d $HOME/google-cloud-sdk/bin ];
+  - if [ ! -d $HOME/google-cloud-sdk/bin ]; then
       curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-218.0.0-linux-x86_64.tar.gz > sdk.tar;
       tar -xzf rebol.tar.gz;
       ls;
