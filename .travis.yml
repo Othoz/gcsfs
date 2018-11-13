@@ -4,12 +4,6 @@ language: python
 python:
   - "3.5"
 
-env:
-  # GCP_PROJECT_ID
-  - secure: "fxL9rEDB3ys8SHnkLBCp+oGlKOr4Q5VR26ZeRDOILd1k7KKGvZqt6j1l6r4Z/5PtYtyc+jWHVbZ0XaMdeOIJyyhQylwRBIKYoQfu3IlEw41FGAcVTw/w3CBYojBHOoxRmsqk2FvVzTJmpBbSz8YRZQ7m3p/WP6obAKpaosflWVvj4cOaUMKCEAXOsCxSaxoFf+ZcYmG3TCn6xmMvFzqssCtKFEXZmeh5aIbhJAlwqyt30kwuvACsJoqCRUvsL5zA5NWud5uZhXs9u+WKr7j6N+cJ6DJ5FBLVkmsh1kVsy8aT/6dTnkCTfnT7PaNgJxR9Z0cUl6tqXZ5lQnH8OtcHDf+I3MO+vfAVNxRhjjhHLyc/yvSuOj48K1siKDc6q7mNLj0hOcUKk+Hw+dKkU82nyNygV2huTwd7Z2DQiLchtzuZ7J+zEb+1pgw8rbFhBs3nKRPwlHIQEOVQ4hN78R58Yc22oceCQA3U3LUIHlxe+CDJl0zx0e4ulOvnoP3SlJwySUzO6lOzb73bEIE0qORH5mAXoV2t86LFHiUvtasd1+K2g+/kiJMB8O2yaTC/KArAv/EcEVXeBV1FA10sT81InDxymfc4Kw5bguo9vq805poN8kpAtBZ/61TjB5XwLeU3gn9C0Ze/7Y/qCiiwTSl/cftnk9znb8zCNFN4Quy+AS0="
-  # CODACY_PROJECT_TOKEN
-  - secure: "bPKyJhKopXCDDFgRKYOjXJOXO0xYC+9524HT6Ub+WKpmDgIStTRxDN2/AZacyJtpSFGAartryRM5aGxnxHiPxzOZtEaNOSQIdaTmvST/IpCkiRcANnKDP/nqEmZMq4q8qPQOHor5xzYbsUQLsxQU3cRnmhXhZpwlEjV+TKB5S+alpBN4vRu3fxuq9XjjaiJn5iPwTdwdvMHdjYY7szFgrEr7yS/B63zqebzU+LLz3m9N7LYeuMyVw8Ye8jmJBbvp57HnZDkssTzjbQSaskXrwYenNyMp2gMRacgrocbfLoiMKlVvdGjunV/uZiYoYmML+Yp+LvRd00tesSqusEHLqN5Xc6qjBW6OdSU2rfFLvDPckwelxI6rhPwS/jEOgsHWzNgIsX+g5OSKICa3I3fBelb0dRkGytB9PxJybO5hYvACKDtQ7QVSt5F+VxQ1aSgMp7ZA7iNih0ZJrcNYjmShBGh6xIKELder7bACWUBQsISlaXoyXVKAuDRSP9MpDyN9qrAYVbg41WeYCBgoRInNb4jd0XV09k5e1FjgZwYYHg9wTWhJWzZTmktw2qJaAyGLj5GTqQCbHOKJ2iEDikOVoIdo3FHVRpxuvpbe6Au4pPw2bf33DmtlZZVEg9K+gJd/ecl/SGqzmN/AbRcpp4eVruweZv6RPCwKkDBNgBtocgk="
-
 cache:
   directories:
   - $HOME/google-cloud-sdk
@@ -18,13 +12,13 @@ before_install:
   - openssl aes-256-cbc -K $encrypted_c81453105ad2_key -iv $encrypted_c81453105ad2_iv -in fs_gcsfs/tests/gcs-test-key.json.enc -out gcs-test-key.json -d
   - ls
   - if [ ! -d $HOME/google-cloud-sdk ]; then
-      curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-218.0.0-linux-x86_64.tar.gz > google-cloud-sdk.tar.gz;
-      tar -xzf google-cloud-sdk.tar.gz;
-      ./google-cloud-sdk/install.sh --usage-reporting=false --command-completion=false --path-update=false;
+      curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-218.0.0-linux-x86_64.tar.gz > $HOME/google-cloud-sdk.tar.gz;
+      tar -xzf $HOME/google-cloud-sdk.tar.gz;
+      $HOME/google-cloud-sdk/install.sh --usage-reporting=false --command-completion=false --path-update=false;
     fi
-  - ls
-  - ls google-cloud-sdk
-  - source ./google-cloud-sdk/path.bash.inc;
+  - ls $HOME
+  - ls $HOME/google-cloud-sdk
+  - source $HOME/google-cloud-sdk/path.bash.inc;
   - gcloud auth activate-service-account --key-file ./gcs-test-key.json
   - gcloud config set project ${GCP_PROJECT_ID}
 
