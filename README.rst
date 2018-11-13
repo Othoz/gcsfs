@@ -13,6 +13,9 @@ A Python filesystem abstraction of Google Cloud Storage (GCS) implemented as a `
 .. image:: https://travis-ci.org/Othoz/gcsfs.svg?branch=master
     :target: https://travis-ci.org/Othoz/gcsfs
 
+.. image:: https://readthedocs.org/projects/fs-gcsfs/badge/?version=latest
+    :target: https://fs-gcsfs.readthedocs.io/en/latest/?badge=latest
+
 .. image:: https://api.codacy.com/project/badge/Coverage/6377a6e321cd4ccf94dfd6f09456d9ce
     :target: https://www.codacy.com/app/Othoz/gcsfs?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Othoz/gcsfs&amp;utm_campaign=Badge_Coverage
 

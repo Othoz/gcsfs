@@ -17,7 +17,7 @@ import sys
 sys.path.insert(0, os.path.abspath('../'))
 
 version_namespace = {}
-with open("fs_gcsfs/_version.py") as f:
+with open("../fs_gcsfs/_version.py") as f:
     exec(f.read(), version_namespace)  # nosec  # pylint: disable=exec-used
 
 
