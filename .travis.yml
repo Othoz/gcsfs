@@ -4,9 +4,20 @@ language: python
 python:
   - "3.5"
 
+cache:
+  directories:
+  - $HOME/google-cloud-sdk
+
 install:
   - pip install pipenv
   - pipenv install --dev --three
+
+before_script:
+  - if [ ! -d $HOME/google-cloud-sdk/bin ]; then rm -rf $HOME/google-cloud-sdk; curl https://sdk.cloud.google.com | bash > /dev/null; fi
+  - echo ${GCP_DEPLOYMENT_SERVICE_ACCOUNT_KEY_FILE} > /root/client-secret.json
+  - export GOOGLE_APPLICATION_CREDENTIALS=/root/client-secret.json
+  - gcloud auth activate-service-account --key-file /root/client-secret.json
+  - gcloud config set project ${GCP_PROJECT_ID}
 
 script:
   - flake8
