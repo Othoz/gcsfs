@@ -4,6 +4,10 @@ language: python
 python:
   - "3.5"
 
+env:
+  # GCP_PROJECT_ID
+  - secure: "nf6pTEQvC9HzDf8MOBvXJjJNnRvKgb06gJtUw3umEylee2gXdYf073ZRZ7GM47i2HcI/99COMGsAf+xejaCCW6YUiFHyMS6tqZkUwvRCLFQ5vl+l+DB/HaqHoh03gADO/D43UupQHyeD1AGbbnzheIRP3+EqXXxLnkilp99aUf4ubXVCnMuvIYWIaH05GmDs5PiJKG1kBxR9SXtFtdJmx5/QrvMoqoP+UVszjybMtSFBDPS0BRR9GVrP3pRaqhIDN1UTo8eKJKVaivHv/pN8+j3DOgY2I989igCvMTDDNVT9f4HOc8Ler4dlzefceFmuSgqnrAw4NaRqeR9NPgHP9/ZYAKk1BUpxBOv5eeBxMhXfE8YmYngxcIU7CALmK+TqP66wJ5xfPzWIJaTCwrhrlaDRybAGZ74gF25YOt1lCjgqw346vVx+C1NYdi7YDqmsexAEATDMFoecVnLodlZ/dBhNfG2GkgGwMba9L2CO1VtDH+pqX7fSlKM0tbgPl6n1V5j/Uri8h87jnoLbNij7ghoxXCYADUZYwTis5LT1ODu2DdESXXvfYXJEurbqEQasffret14wc1aAISc8Bbg+qqjcS7tuuNx9xpWzChcdWax9bstz9WqPh5A38kw5rmMwG4UtLARf8bEZGV8ZqDX9DE8KaGI8arD8Iwhxrz8IRcU="
+
 cache:
   directories:
   - $HOME/google-cloud-sdk
