@@ -22,12 +22,16 @@ if __name__ == "__main__":
         long_description_content_type="text/x-rst",
         keywords=["pyfilesystem", "filesystem", "google", "gcs", "google cloud storage"],
         url="https://github.com/Othoz/gcsfs",
+        project_urls={
+            "Bug Tracker": "https://github.com/Othoz/gcsfs/issues",
+            "Documentation": "http://fs-gcsfs.readthedocs.io/en/latest/",
+        },
         packages=["fs_gcsfs"],
         license="MIT",
         python_requires=">=3.5",
         install_requires=[
-            "fs~=2.0",  # TODO Test this + latest version with travis
-            "google-cloud-storage~=1.0",  # TODO Test this + latest version with travis
+            "fs~=2.0",
+            "google-cloud-storage~=1.0",
         ],
         entry_points={
             "fs.opener": [

@@ -1,7 +1,7 @@
 GCSFS
 =====
 
-A Python filesystem abstraction of Google Cloud Storage (GCS) implemented as a `PyFilesystem2 <https://github.com/PyFilesystem/pyfilesystem2>`_ extension.
+A Python filesystem abstraction of Google Cloud Storage (GCS) implemented as a `PyFilesystem2 <https://github.com/PyFilesystem/pyfilesystem2>`__ extension.
 
 
 .. image:: https://img.shields.io/pypi/v/fs-gcsfs.svg
@@ -13,21 +13,32 @@ A Python filesystem abstraction of Google Cloud Storage (GCS) implemented as a `
 .. image:: https://travis-ci.org/Othoz/gcsfs.svg?branch=master
     :target: https://travis-ci.org/Othoz/gcsfs
 
+.. image:: https://readthedocs.org/projects/fs-gcsfs/badge/?version=latest
+    :target: https://fs-gcsfs.readthedocs.io/en/latest/?badge=latest
+
 .. image:: https://api.codacy.com/project/badge/Coverage/6377a6e321cd4ccf94dfd6f09456d9ce
     :target: https://www.codacy.com/app/Othoz/gcsfs?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Othoz/gcsfs&amp;utm_campaign=Badge_Coverage
 
 .. image:: https://api.codacy.com/project/badge/Grade/6377a6e321cd4ccf94dfd6f09456d9ce
     :target: https://www.codacy.com/app/Othoz/gcsfs?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Othoz/gcsfs&amp;utm_campaign=Badge_Grade
 
-.. image:: https://img.shields.io/github/license/Othoz/gcsfs.svg
-    :target: https://github.com/PyFilesystem/pyfilesystem2/blob/master/LICENSE
+
+With GCSFS, you can interact with `Google Cloud Storage <https://cloud.google.com/storage/>`__ as if it was a regular filesystem.
+
+Apart from the nicer interface, this will highly decouple your code from the underlying storage mechanism: Exchanging the storage backend with an
+`in-memory filesystem <https://pyfilesystem2.readthedocs.io/en/latest/reference/memoryfs.html>`__ for testing or any other
+filesystem like `S3FS <https://github.com/pyfilesystem/s3fs>`__ becomes as easy as replacing ``gs://bucket_name`` with ``mem://`` or ``s3://bucket_name``.
+
+For a full reference on all the PyFilesystem possibilities, take a look at the
+`PyFilesystem Docs <https://pyfilesystem2.readthedocs.io/en/latest/index.html>`__!
 
 
-GCSFS lets you interact with `Google Cloud Storage <https://cloud.google.com/storage/>`_ like it wasn't an object store but a regular filesystem.
-As it implements the common PyFilesystem interface, it is easy to exchange the underlying storage mechanism.
-You do not need to change any of your code to instead use e.g. `S3FS <https://github.com/pyfilesystem/s3fs>`_ or a simple `in-memory filesystem <https://pyfilesystem2.readthedocs.io/en/latest/reference/memoryfs.html>`_ for testing.
+Documentation
+-------------
 
-For a full reference on all the PyFilesystem possibilities, take a look at the `PyFilesystem Docs <https://pyfilesystem2.readthedocs.io/en/latest/index.html>`_!
+-  `GCSFS Documentation <http://fs-gcsfs.readthedocs.io/en/latest/>`__
+-  `PyFilesystem Wiki <https://www.pyfilesystem.org>`__
+-  `PyFilesystem Reference <https://docs.pyfilesystem.org/en/latest/reference/base.html>`__
 
 
 Installing
@@ -40,10 +51,26 @@ Install the latest GCSFS version by running::
 A conda-forge release is planned for the near future!
 
 
-How To Use
-----------
+Examples
+--------
 
-Instantiating a GCS filesystem and working with it is as easy as:
+Instantiating a filesystem on Google Cloud Storage (for a full reference visit the
+`Documentation <http://fs-gcsfs.readthedocs.io/en/latest/index.html#reference>`__):
+
+.. code-block:: python
+
+    from fs_gcsfs import GCSFS
+    gcsfs = GCSFS(bucket_name="mybucket")
+
+
+Alternatively you can use a `FS URL <https://pyfilesystem2.readthedocs.io/en/latest/openers.html>`__ to open up a filesystem:
+
+.. code-block:: python
+
+    from fs import open_fs
+    gcsfs = open_fs("gs://mybucket/root_path?strict=False")
+
+You can use GCSFS like your local filesystem:
 
 .. code-block:: python
 
@@ -57,56 +84,50 @@ Instantiating a GCS filesystem and working with it is as easy as:
     │   └── baz
     │       └── file3.txt
     └── file4.json
-
-
-Alternatively you can use an `opener <https://pyfilesystem2.readthedocs.io/en/latest/openers.html>`_ URL:
-
-.. code-block:: python
-
-    >>> from fs import open_fs
-    >>> gcsfs = open_fs("gs://mybucket")
     >>> gcsfs.listdir("foo")
     ["bar", "baz"]
+    >>> gcsfs.isdir("foo/bar")
+    True
 
 
-Uploading files is as easy as moving them on your local filesystem:
+Uploading a file is as easy as:
 
 .. code-block:: python
 
     from fs_gcsfs import GCSFS
     gcsfs = GCSFS(bucket_name="mybucket")
-
-    with open("image.jpg", "rb") as local_file:
-        with gcsfs.open("image.jpg", "wb") as gcs_file:
+    with open("local/path/image.jpg", "rb") as local_file:
+        with gcsfs.open("path/on/bucket/image.jpg", "wb") as gcs_file:
             gcs_file.write(local_file.read())
 
-For more information on the usage of PyFilesystem and its extensions see the official `Reference <https://pyfilesystem2.readthedocs.io/en/latest/reference/base.html>`_
+
+You can even sync an entire bucket on your local filesystem by using PyFilesystem's utility methods:
+
+.. code-block:: python
+
+    from fs_gcsfs import GCSFS
+    from fs.osfs import OSFS
+    from fs.copy import copy_fs
+
+    gcsfs = GCSFS(bucket_name="mybucket")
+    local_fs = OSFS("local/path")
+
+    copy_fs(gcsfs, local_fs)
 
 
-
-Limitations
------------
-
-A filesystem built on top of an object store like GCS suffers from the same limitations as the ones
-`mentioned in S3FS <https://fs-s3fs.readthedocs.io/en/latest/#limitations>`_.
-
-GCS does not offer true directories which is why GCSFS (as well as S3FS) will simulate the existence
-of a directory called ``foo`` by adding an empty blob called ``foo/``. Any filesystem content that was not created
-via GCSFS will lack these directory markers which may lead to wrong behaviour. For example ``gcsfs.isdir("bar")``
-will return ``False`` if the marker blob ``bar/`` does not exist, even though there might exist a blob called ``bar/baz.txt``.
-
-*TODO: Finish and document the "fix storage feature"*
+For exploring all the possibilities of GCSFS and other filesystems implementing the PyFilesystem interface, we recommend visiting the official
+`PyFilesystem Docs <https://pyfilesystem2.readthedocs.io/en/latest/index.html>`__!
 
 
 Development
 -----------
 
-To develop on this project make sure you have `pipenv <https://pipenv.readthedocs.io/en/latest/>`_ installed
+To develop on this project make sure you have `pipenv <https://pipenv.readthedocs.io/en/latest/>`__ installed
 and run the following from the root directory of the project::
 
     $ pipenv install --dev --three
 
-This will create a virtualenv with all packages and dev-packages installed. Now you can for example
+This will create a virtualenv with all packages and dev-packages installed. Now you can, for example,
 run all tests via::
 
     $ pipenv run pytest
@@ -115,13 +136,4 @@ run all tests via::
 Credits
 -------
 
-Credits go to `S3FS <https://github.com/PyFilesystem/s3fs>`_ which was the main source of inspiration and shares a lot of code with GCSFS.
-
-
-Documentation
--------------
-
--  `PyFilesystem Wiki <https://www.pyfilesystem.org>`_
--  `PyFilesystem Reference <https://docs.pyfilesystem.org/en/latest/reference/base.html>`_
-
-.. TODO `GCS Reference <http://fs-gcsfs.readthedocs.io/en/latest/>`_
+Credits go to `S3FS <https://github.com/PyFilesystem/s3fs>`__ which was the main source of inspiration and shares a lot of code with GCSFS.
