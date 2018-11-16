@@ -20,6 +20,14 @@ Possible types of changes are:
 Unreleased
 ----------
 
+Removed
+'''''''
+- ``delimiter`` property from ``GCSFS`` as it was not fully functional and we currently do not have any use case for it
+
+Fixed
+'''''
+- ``GCSFS.listdir()`` and ``GCSFS.scandir()`` now also correctly list blobs on the root level of a bucket
+
 
 0.2.0 - 09.11.2018
 ------------------
@@ -27,12 +35,13 @@ Unreleased
 Changed
 '''''''
 - Open-sourced GCSFS by moving it to GitHub
-- Removed ``project`` and ``credentials`` properties from ``GCSFS``.
-  Instead, one can now optionally pass a ``client`` of type
-  `google.cloud.storage.Client <https://googleapis.github.io/google-cloud-python/latest/storage/client.html#module-google.cloud.storage.client>`_.
 - ``GCSFS.getinfo()`` does not magically fix missing directory markers anymore.
   Instead, there is a new method ``GCSFS.fix_storage()`` which can be explicitly called to check and fix the entire filesystem.
 
+Removed
+'''''''
+- ``project`` and ``credentials`` properties from ``GCSFS``. Instead, one can now optionally pass a ``client`` of type
+  `google.cloud.storage.Client <https://googleapis.github.io/google-cloud-python/latest/storage/client.html#module-google.cloud.storage.client>`_.
 
 0.1.6 - 30.10.2018
 ------------------

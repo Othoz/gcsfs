@@ -32,7 +32,6 @@ class GCSFS(FS):
     Args:
         bucket_name: The GCS bucket name.
         root_path: The root directory within the GCS Bucket
-        delimiter: The delimiter to separate folders
         client: A :class:`google.storage.Client` exposing the google storage API.
         strict: When ``True`` (default) GCSFS will follow the PyFilesystem specification exactly. Set to ``False`` to disable validation of destination paths
             which may speed up uploads / downloads.
@@ -48,21 +47,19 @@ class GCSFS(FS):
         "virtual": False,
     }
 
-    STANDARD_DELIMITER = "/"
+    DELIMITER = "/"
 
     def __init__(self,
                  bucket_name: str,
                  root_path: str = None,
-                 delimiter: str = STANDARD_DELIMITER,
                  client: Client = None,
                  strict: bool = True):
         self._bucket_name = bucket_name
         if not root_path:
-            root_path = self.STANDARD_DELIMITER
+            root_path = ""
         self.root_path = root_path
-        self._prefix = relpath(normpath(root_path)).rstrip(delimiter)
+        self._prefix = relpath(normpath(root_path)).rstrip(self.DELIMITER)
 
-        self.delimiter = delimiter
         self.strict = strict
 
         self.client = client
@@ -76,8 +73,7 @@ class GCSFS(FS):
         return _make_repr(
             self.__class__.__name__,
             self._bucket_name,
-            root_path=(self.root_path, self.STANDARD_DELIMITER),
-            delimiter=(self.delimiter, self.STANDARD_DELIMITER)
+            root_path=(self.root_path, self.DELIMITER)
         )
 
     def __str__(self) -> str:
@@ -87,8 +83,8 @@ class GCSFS(FS):
 
     def _path_to_key(self, path: str) -> str:
         """Converts an fs path to a GCS key."""
-        path = relpath(normpath(path))
-        return self.delimiter.join([self._prefix, path]).lstrip("/").replace("/", self.delimiter).rstrip(self.delimiter)
+        _path = relpath(normpath(path))
+        return self.DELIMITER.join([self._prefix, _path]).lstrip(self.DELIMITER).rstrip(self.DELIMITER)
 
     def _path_to_dir_key(self, path: str) -> str:
         """Converts an fs path to a GCS dict key."""
@@ -96,7 +92,6 @@ class GCSFS(FS):
 
     def _get_blob(self, key: str) -> Optional[Blob]:
         """Returns blob if exists or None otherwise"""
-        # TODO This method should be responsible for correctly converting PyFilesystem to GCSFS delimiters
         return self.bucket.get_blob(key)
 
     def getinfo(self, path: str, namespaces: Optional[List[str]] = None, check_parent_dir: bool = True) -> Info:
@@ -154,7 +149,7 @@ class GCSFS(FS):
     def _dir_info(self, name: str) -> Info:
         return Info({
             "basic": {
-                "name": name.rstrip(self.delimiter),
+                "name": name.rstrip(self.DELIMITER),
                 "is_dir": True
             },
             "details": {
@@ -193,21 +188,21 @@ class GCSFS(FS):
         prefix_len = len(prefix)
 
         # Build set of root level directories
-        page_iterator = self.bucket.list_blobs(prefix=prefix, delimiter="/")
-        prefixes = set()
+        page_iterator = self.bucket.list_blobs(prefix=prefix, delimiter=self.DELIMITER)
+        dir_prefixes = set()
         for page in page_iterator.pages:
-            prefixes.update(page.prefixes)
+            dir_prefixes.update(page.prefixes)
 
         # Loop over all root level directories
-        for prefix in prefixes:
-            _name = prefix[prefix_len:]
+        for dir_prefix in dir_prefixes:
+            _name = dir_prefix[prefix_len:]
             if return_info:
                 yield self._dir_info(_name)
             else:
-                yield _name.rstrip(self.delimiter)
+                yield _name.rstrip(self.DELIMITER)
 
         # Loop over all root level blobs
-        item_iterator = self.bucket.list_blobs(prefix=dir_key, delimiter="/")
+        item_iterator = self.bucket.list_blobs(prefix=prefix, delimiter=self.DELIMITER)
         for blob in list(item_iterator):
             if blob.name == dir_key:  # Don't return root directory
                 continue
@@ -408,11 +403,12 @@ class GCSFS(FS):
         else:
             return self.isdir(path)
 
-    def geturl(self, path: str, purpose: str = "download"):  # See https://fs-s3fs.readthedocs.io/en/latest/index.html#urls
+    def geturl(self, path: str, purpose: str = "download"):
+        # TODO This does currently not have the same functionality as S3FS.geturl() (returning a public URL) which may be confusing to users
         _path = self.validatepath(path)
         _key = self._path_to_key(_path)
         if purpose == "download":
-            return "gs://" + self.delimiter.join([self._bucket_name, _key])
+            return "gs://" + self.DELIMITER.join([self._bucket_name, _key])
         else:
             raise errors.NoURL(path, purpose)
 
