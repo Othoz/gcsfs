@@ -101,15 +101,31 @@ will return ``False`` if the marker blob ``bar/`` does not exist, even though th
 Development
 -----------
 
-To develop on this project make sure you have `pipenv <https://pipenv.readthedocs.io/en/latest/>`_ installed
+To further improve this project install `pipenv <https://pipenv.readthedocs.io/en/latest/>`_
 and run the following from the root directory of the project::
 
     $ pipenv install --dev --three
 
-This will create a virtualenv with all packages and dev-packages installed. Now you can for example
-run all tests via::
+This will create a virtualenv with all packages and dev-packages installed.
+
+
+Tests
+-----
+All CI tests run against an actual GCS bucket provided by `Othoz GmbH <http://othoz.com/>`__. In order to run the tests against your own bucket,
+make sure to set up a `Service Account <Othoz GmbH https://cloud.google.com/iam/docs/service-accounts>`__ with all necessary permissions:
+
+- storage.buckets.get
+- storage.objects.get
+- storage.objects.list
+- storage.objects.create
+- storage.objects.update
+- storage.objects.delete
+
+Expose your bucket name as an environment variable ``$TEST_BUCKET`` and run the tests via::
 
     $ pipenv run pytest
+
+Note that the tests mostly wait for I/O, therefore it makes sense to highly parallelize them with `xdist <https://github.com/pytest-dev/pytest-xdist>`__.
 
 
 Credits

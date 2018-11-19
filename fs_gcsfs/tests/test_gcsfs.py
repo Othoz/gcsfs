@@ -1,5 +1,6 @@
 import unittest
 import uuid
+import os
 
 import pytest
 from fs.test import FSTestCases
@@ -7,7 +8,7 @@ from google.cloud.storage import Client
 
 from fs_gcsfs import GCSFS
 
-TEST_BUCKET = "othoz-gcsfs-tests"
+TEST_BUCKET = os.environ['TEST_BUCKET']
 
 
 class TestGCSFSPyFileSystem(FSTestCases, unittest.TestCase):
