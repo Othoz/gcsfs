@@ -3,6 +3,7 @@ import uuid
 import os
 
 import pytest
+from fs.errors import IllegalBackReference
 from fs.test import FSTestCases
 from google.cloud.storage import Client
 
@@ -11,7 +12,7 @@ from fs_gcsfs import GCSFS
 TEST_BUCKET = os.environ['TEST_BUCKET']
 
 
-class TestGCSFSPyFileSystem(FSTestCases, unittest.TestCase):
+class TestGCSFS(FSTestCases, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -33,6 +34,15 @@ class TestGCSFSPyFileSystem(FSTestCases, unittest.TestCase):
 
 
 @pytest.fixture(scope="module")
+def client_mock():
+    class ClientMock:
+        """A client mock class to instantiate GCSFS without making any requests in the constructor"""
+        def get_bucket(self, _):
+            pass
+    return ClientMock()
+
+
+@pytest.fixture(scope="module")
 def client():
     return Client()
 
@@ -46,57 +56,91 @@ def bucket(client):
 def tmp_gcsfs(bucket, client):
     """Yield a temporary `GCSFS` at a unique 'root-blob' within the test bucket."""
     path = "gcsfs/" + str(uuid.uuid4())
-    fs = GCSFS(bucket_name=bucket.name, root_path=path, client=client)
-    yield fs
-
-    fs.close()
+    yield GCSFS(bucket_name=bucket.name, root_path=path, client=client)
     for blob in bucket.list_blobs(prefix=path):
         blob.delete()
 
 
-class TestGCSFS:
+@pytest.mark.parametrize("path,root_path,expected", [
+    ("", None, ""),
+    (".", None, ""),
+    ("/", None, ""),
+    ("foo", None, "foo"),
+    ("/foo", None, "foo"),
+    ("./foo", None, "foo"),
+    ("foo/", None, "foo"),
+    ("/foo/", None, "foo"),
+    ("foo/bar", None, "foo/bar"),
+    ("/foo/bar/", None, "foo/bar"),
+    ("foo/../bar", None, "bar"),
+    ("foo/../bar/..", None, ""),
+    ("foo/../foo/bar", None, "foo/bar"),
+    ("", "root_path", "root_path"),
+    ("./", "root_path", "root_path"),
+    ("foo", "root_path", "root_path/foo"),
+    ("./foo", "root_path", "root_path/foo"),
+    ("foo/../bar", "root_path", "root_path/bar"),
+])
+def test_path_to_key(path, root_path, expected, client_mock):
+    gcs_fs = GCSFS(bucket_name="bucket", root_path=root_path, client=client_mock)
+    assert gcs_fs._path_to_key(path) == expected
+    assert gcs_fs._path_to_dir_key(path) == expected + GCSFS.DELIMITER
 
-    @pytest.mark.skip("There is still a bug in the scandir implementaion. Root level blobs (which are not directories) are not listed")
-    def test_scandir_works_on_bucket_as_root_directory(self, client):
-        gcs_fs = GCSFS(bucket_name=TEST_BUCKET, client=client)
-        path = str(uuid.uuid4())
-        with gcs_fs.open(path, "wb") as f:
-            f.write(b"Hallo")
-        result = gcs_fs.listdir("")
-        # Manual clean-up of the file created on the root directory
-        gcs_fs.remove(path)
-        gcs_fs.close()
-        assert path in result
 
-    def test_path_to_key_for_root_returns_root_path(self, tmp_gcsfs):
-        assert tmp_gcsfs._path_to_key("/") == tmp_gcsfs.root_path
+def test_path_to_key_fails_if_path_is_parent_of_root_path(client_mock):
+    gcs_fs = GCSFS(bucket_name="bucket", client=client_mock)
+    with pytest.raises(IllegalBackReference):
+        gcs_fs._path_to_key("..")
 
-    def test_path_to_key_for_empty_string_returns_root_path(self, tmp_gcsfs):
-        assert tmp_gcsfs._path_to_key("") == tmp_gcsfs.root_path
+    gcs_fs_with_root_path = GCSFS(bucket_name="bucket", root_path="root_path", client=client_mock)
+    with pytest.raises(IllegalBackReference):
+        gcs_fs_with_root_path._path_to_key("..")
 
-    def test_fix_storage_adds_binary_blobs_with_empty_string_as_directory_marker(self, bucket, tmp_gcsfs):
-        # Creating a 'nested' hierarchy of blobs without directory marker
-        for path in ["foo/test", "foo/bar/test", "foo/baz/test", "foo/bar/egg/test"]:
-            key = tmp_gcsfs._path_to_key(path)
-            blob = bucket.blob(key)
-            blob.upload_from_string(b"Is this a test? It has to be. Otherwise I can't go on.")
-        tmp_gcsfs.fix_storage()
 
-        for path in ["", "foo", "foo/bar", "foo/baz", "foo/bar/egg"]:
-            assert tmp_gcsfs.isdir(path)
+def test_listdir_works_on_bucket_as_root_directory(client):
+    """Regression test for a bug fixed in 0.2.1"""
+    gcs_fs = GCSFS(bucket_name=TEST_BUCKET, client=client)
 
-    def test_fix_storage_does_not_overwrite_existing_directory_markers_with_custom_content(self, bucket, tmp_gcsfs):
-        for path in ["foo/test"]:
-            key = tmp_gcsfs._path_to_key(path)
-            blob = bucket.blob(key)
-            blob.upload_from_string(b"Is this a test? It has to be. Otherwise I can't go on.")
+    blob = str(uuid.uuid4())
+    directory = str(uuid.uuid4())
 
-        # Manual creation of 'directory marker' with custom content
-        key = tmp_gcsfs._path_to_dir_key("foo/")
+    gcs_fs.touch(blob)
+    gcs_fs.makedir(directory)
+
+    result = gcs_fs.listdir("")
+
+    # Manual clean-up of the created blobs
+    gcs_fs.remove(blob)
+    gcs_fs.removedir(directory)
+
+    assert blob in result
+    assert directory in result
+
+
+def test_fix_storage_adds_binary_blobs_with_empty_string_as_directory_marker(bucket, tmp_gcsfs):
+    # Creating a 'nested' hierarchy of blobs without directory marker
+    for path in ["foo/test", "foo/bar/test", "foo/baz/test", "foo/bar/egg/test"]:
+        key = tmp_gcsfs._path_to_key(path)
         blob = bucket.blob(key)
-        content = b"CUSTOM_DIRECTORY_MARKER_CONTENT"
-        blob.upload_from_string(content)
+        blob.upload_from_string(b"Is this a test? It has to be. Otherwise I can't go on.")
+    tmp_gcsfs.fix_storage()
 
-        tmp_gcsfs.fix_storage()
+    for path in ["", "foo", "foo/bar", "foo/baz", "foo/bar/egg"]:
+        assert tmp_gcsfs.isdir(path)
 
-        assert blob.download_as_string() == content
+
+def test_fix_storage_does_not_overwrite_existing_directory_markers_with_custom_content(bucket, tmp_gcsfs):
+    for path in ["foo/test"]:
+        key = tmp_gcsfs._path_to_key(path)
+        blob = bucket.blob(key)
+        blob.upload_from_string(b"Is this a test? It has to be. Otherwise I can't go on.")
+
+    # Manual creation of 'directory marker' with custom content
+    key = tmp_gcsfs._path_to_dir_key("foo/")
+    blob = bucket.blob(key)
+    content = b"CUSTOM_DIRECTORY_MARKER_CONTENT"
+    blob.upload_from_string(content)
+
+    tmp_gcsfs.fix_storage()
+
+    assert blob.download_as_string() == content
