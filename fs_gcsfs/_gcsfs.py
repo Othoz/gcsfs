@@ -88,7 +88,7 @@ class GCSFS(FS):
 
     def _path_to_dir_key(self, path: str) -> str:
         """Converts an fs path to a GCS dict key."""
-        return forcedir(self._path_to_key(path))
+        return self._path_to_key(path) + GCSFS.DELIMITER
 
     def _get_blob(self, key: str) -> Optional[Blob]:
         """Returns blob if exists or None otherwise"""

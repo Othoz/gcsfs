@@ -83,7 +83,7 @@ def tmp_gcsfs(bucket, client):
 def test_path_to_key(path, root_path, expected, client_mock):
     gcs_fs = GCSFS(bucket_name="bucket", root_path=root_path, client=client_mock)
     assert gcs_fs._path_to_key(path) == expected
-    assert gcs_fs._path_to_dir_key(path) == expected + "/"
+    assert gcs_fs._path_to_dir_key(path) == expected + GCSFS.DELIMITER
 
 
 def test_path_to_key_fails_if_path_is_parent_of_root_path(client_mock):
