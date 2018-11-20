@@ -4,13 +4,18 @@ language: python
 python:
   - "3.5"
 
+before_install:
+  - openssl aes-256-cbc -K $encrypted_b8e3bf9ce0e9_key -iv $encrypted_b8e3bf9ce0e9_iv -in .travis/service-account-key.json.enc -out $HOME/service-account-key.json -d
+  - export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account-key.json
+  - export TEST_BUCKET=othoz-gcsfs-tests
+
 install:
   - pip install pipenv
   - pipenv install --dev --three
 
 script:
   - flake8
-  # - pytest --cov=fs_gcsfs --cov-branch --cov-report=xml  TODO: Find a way to run the tests without accessing an actual bucket
+  - pytest --cov=fs_gcsfs --cov-branch --cov-report=xml --numprocesses=16
 
 deploy:
   provider: pypi

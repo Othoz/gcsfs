@@ -1,5 +1,6 @@
 import unittest
 import uuid
+import os
 
 import pytest
 from fs.errors import IllegalBackReference
@@ -8,7 +9,7 @@ from google.cloud.storage import Client
 
 from fs_gcsfs import GCSFS
 
-TEST_BUCKET = "othoz-test"
+TEST_BUCKET = os.environ['TEST_BUCKET']
 
 
 class TestGCSFS(FSTestCases, unittest.TestCase):
