@@ -111,8 +111,8 @@ This will create a virtualenv with all packages and dev-packages installed.
 
 Tests
 -----
-All CI tests run against an actual GCS bucket provided by `Othoz GmbH <http://othoz.com/>`__. In order to run the tests against your own bucket,
-make sure to set up a `Service Account <Othoz GmbH https://cloud.google.com/iam/docs/service-accounts>`__ with all necessary permissions:
+All CI tests run against an actual GCS bucket provided by `Othoz <http://othoz.com/>`__. In order to run the tests against your own bucket,
+make sure to set up a `Service Account <https://cloud.google.com/iam/docs/service-accounts>`__ with all necessary permissions:
 
 - storage.buckets.get
 - storage.objects.get
