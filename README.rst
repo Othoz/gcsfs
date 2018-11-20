@@ -48,7 +48,9 @@ Install the latest GCSFS version by running::
 
     $ pip install fs-gcsfs
 
-A conda-forge release is planned for the near future!
+Or in case you are using conda::
+
+    $ conda install -c conda-forge fs-gcsfs
 
 
 Examples

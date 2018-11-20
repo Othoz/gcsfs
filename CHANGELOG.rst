@@ -20,6 +20,14 @@ Possible types of changes are:
 Unreleased
 ----------
 
+
+0.3.0 - 20.11.2018
+------------------
+
+Added
+'''''
+- This is the first release available on `conda-forge <https://conda-forge.org/>`__
+
 Removed
 '''''''
 - ``delimiter`` property from ``GCSFS`` as it was not fully functional and we currently do not have any use case for it
@@ -41,7 +49,7 @@ Changed
 Removed
 '''''''
 - ``project`` and ``credentials`` properties from ``GCSFS``. Instead, one can now optionally pass a ``client`` of type
-  `google.cloud.storage.Client <https://googleapis.github.io/google-cloud-python/latest/storage/client.html#module-google.cloud.storage.client>`_.
+  `google.cloud.storage.Client <https://googleapis.github.io/google-cloud-python/latest/storage/client.html#module-google.cloud.storage.client>`__.
 
 0.1.6 - 30.10.2018
 ------------------
