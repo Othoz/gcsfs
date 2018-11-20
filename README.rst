@@ -50,7 +50,7 @@ Install the latest GCSFS version by running::
 
 Or in case you are using conda::
 
-    $ conda -c conda-forge install fs-gcsfs
+    $ conda install -c conda-forge fs-gcsfs
 
 
 Examples
