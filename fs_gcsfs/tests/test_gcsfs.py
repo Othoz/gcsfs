@@ -3,13 +3,13 @@ import uuid
 import os
 
 import pytest
-from fs.errors import IllegalBackReference
+from fs.errors import IllegalBackReference, CreateFailed
 from fs.test import FSTestCases
 from google.cloud.storage import Client
 
 from fs_gcsfs import GCSFS
 
-TEST_BUCKET = os.environ['TEST_BUCKET']
+TEST_BUCKET = "othoz-test"  # os.environ['TEST_BUCKET']
 
 
 class TestGCSFS(FSTestCases, unittest.TestCase):
@@ -30,7 +30,7 @@ class TestGCSFS(FSTestCases, unittest.TestCase):
             blob.delete()
 
     def make_fs(self):
-        return GCSFS(bucket_name=TEST_BUCKET, root_path=self.root_path, client=self.client)
+        return GCSFS(bucket_name=TEST_BUCKET, root_path=self.root_path, client=self.client, create=True)
 
 
 @pytest.fixture(scope="module")
@@ -56,7 +56,7 @@ def bucket(client):
 def tmp_gcsfs(bucket, client):
     """Yield a temporary `GCSFS` at a unique 'root-blob' within the test bucket."""
     path = "gcsfs/" + str(uuid.uuid4())
-    yield GCSFS(bucket_name=bucket.name, root_path=path, client=client)
+    yield GCSFS(bucket_name=bucket.name, root_path=path, client=client, create=True)
     for blob in bucket.list_blobs(prefix=path):
         blob.delete()
 
@@ -82,24 +82,24 @@ def tmp_gcsfs(bucket, client):
     ("foo/../bar", "root_path", "root_path/bar"),
 ])
 def test_path_to_key(path, root_path, expected, client_mock):
-    gcs_fs = GCSFS(bucket_name="bucket", root_path=root_path, client=client_mock)
+    gcs_fs = GCSFS(bucket_name=TEST_BUCKET, root_path=root_path, client=client_mock, strict=False)
     assert gcs_fs._path_to_key(path) == expected
     assert gcs_fs._path_to_dir_key(path) == expected + GCSFS.DELIMITER
 
 
 def test_path_to_key_fails_if_path_is_parent_of_root_path(client_mock):
-    gcs_fs = GCSFS(bucket_name="bucket", client=client_mock)
+    gcs_fs = GCSFS(bucket_name=TEST_BUCKET, client=client_mock, strict=False)
     with pytest.raises(IllegalBackReference):
         gcs_fs._path_to_key("..")
 
-    gcs_fs_with_root_path = GCSFS(bucket_name="bucket", root_path="root_path", client=client_mock)
+    gcs_fs_with_root_path = GCSFS(bucket_name="bucket", root_path="root_path", client=client_mock, strict=False)
     with pytest.raises(IllegalBackReference):
         gcs_fs_with_root_path._path_to_key("..")
 
 
 def test_listdir_works_on_bucket_as_root_directory(client):
     """Regression test for a bug fixed in 0.2.1"""
-    gcs_fs = GCSFS(bucket_name=TEST_BUCKET, client=client)
+    gcs_fs = GCSFS(bucket_name=TEST_BUCKET, client=client, create=True)
 
     blob = str(uuid.uuid4())
     directory = str(uuid.uuid4())
@@ -144,3 +144,13 @@ def test_fix_storage_does_not_overwrite_existing_directory_markers_with_custom_c
     tmp_gcsfs.fix_storage()
 
     assert blob.download_as_string() == content
+
+
+def test_instantiation_fails_if_no_access_to_bucket():
+    with pytest.raises(CreateFailed):
+        GCSFS(bucket_name=str(uuid.uuid4()))
+
+
+def test_instantiation_with_create_false_fails_for_non_existing_root_path():
+    with pytest.raises(CreateFailed):
+        GCSFS(bucket_name=TEST_BUCKET, root_path=str(uuid.uuid4()), create=False)

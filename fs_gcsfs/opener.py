@@ -17,9 +17,9 @@ class GCSFSOpener(Opener):
         path_parts = iteratepath(parse_result.resource)
 
         bucket_name = path_parts[0]
-        dir_path = join(*path_parts[1:])
+        root_path = join(*path_parts[1:])
 
         if not bucket_name:
             raise OpenerError("invalid bucket name in '{}'".format(fs_url))
 
-        return GCSFS(bucket_name, dir_path)
+        return GCSFS(bucket_name, root_path=root_path, create=create)
