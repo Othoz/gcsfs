@@ -1,6 +1,5 @@
 import unittest
 import uuid
-import os
 
 import pytest
 from fs.errors import IllegalBackReference, CreateFailed
