@@ -10,6 +10,7 @@ from typing import Optional, List, Union, Tuple, Iterator
 import google
 from fs import ResourceType, errors, tools
 from fs.base import FS
+from fs.errors import CreateFailed
 from fs.info import Info
 from fs.mode import Mode
 from fs.path import basename, dirname, forcedir, normpath, relpath, join
@@ -32,9 +33,11 @@ class GCSFS(FS):
     Args:
         bucket_name: The GCS bucket name.
         root_path: The root directory within the GCS Bucket
+        create: Whether to create ``root_path`` on initialization or not. If ``root_path`` does not yet exist and ``create=False`` a ``CreateFailed``
+            exception will be raised. To disable ``root_path`` validation entirely set ``strict=False``.
         client: A :class:`google.storage.Client` exposing the google storage API.
         strict: When ``True`` (default) GCSFS will follow the PyFilesystem specification exactly. Set to ``False`` to disable validation of destination paths
-                which may speed up uploads / downloads.
+            which may speed up some operations.
     """
 
     _meta = {
@@ -52,8 +55,10 @@ class GCSFS(FS):
     def __init__(self,
                  bucket_name: str,
                  root_path: str = None,
+                 create: bool = False,
                  client: Client = None,
                  strict: bool = True):
+        super().__init__()
         self._bucket_name = bucket_name
         if not root_path:
             root_path = ""
@@ -66,8 +71,20 @@ class GCSFS(FS):
         if self.client is None:
             self.client = Client()
 
-        self.bucket = self.client.get_bucket(self._bucket_name)
-        super(GCSFS, self).__init__()
+        try:
+            self.bucket = self.client.get_bucket(self._bucket_name)
+        except google.api_core.exceptions.NotFound as err:
+            raise CreateFailed("The bucket \"{}\" does not seem to exist".format(self._bucket_name)) from err
+        except google.api_core.exceptions.Forbidden as err:
+            raise CreateFailed("You don't have access to the bucket \"{}\"".format(self._bucket_name)) from err
+
+        if create:
+            root_marker = self._get_blob(forcedir(root_path))
+            if root_marker is None:
+                blob = self.bucket.blob(forcedir(root_path))
+                blob.upload_from_string(b"")
+        elif strict and self._get_blob(forcedir(root_path)) is None:
+            raise errors.CreateFailed("Root path \"{}\" does not exist".format(root_path))
 
     def __repr__(self) -> str:
         return _make_repr(
