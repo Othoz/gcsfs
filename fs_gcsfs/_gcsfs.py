@@ -33,7 +33,7 @@ class GCSFS(FS):
     Args:
         bucket_name: The GCS bucket name.
         root_path: The root directory within the GCS Bucket
-        create: Whether to create ``root_path`` on initialization or not. If ``root_path`` does not yet exist and ``create=False`` an ``CreateFailed``
+        create: Whether to create ``root_path`` on initialization or not. If ``root_path`` does not yet exist and ``create=False`` a ``CreateFailed``
             exception will be raised. To disable ``root_path`` validation entirely set ``strict=False``.
         client: A :class:`google.storage.Client` exposing the google storage API.
         strict: When ``True`` (default) GCSFS will follow the PyFilesystem specification exactly. Set to ``False`` to disable validation of destination paths
@@ -74,17 +74,17 @@ class GCSFS(FS):
         try:
             self.bucket = self.client.get_bucket(self._bucket_name)
         except google.api_core.exceptions.NotFound as err:
-            raise CreateFailed("The provided bucket does not seem to exist") from err
+            raise CreateFailed("The bucket \"{}\" does not seem to exist".format(self._bucket_name)) from err
         except google.api_core.exceptions.Forbidden as err:
-            raise CreateFailed("You don't have access to the provided bucket") from err
+            raise CreateFailed("You don't have access to the bucket \"{}\"".format(self._bucket_name)) from err
 
         if create:
             root_marker = self._get_blob(forcedir(root_path))
-            if not root_marker:
+            if root_marker is None:
                 blob = self.bucket.blob(forcedir(root_path))
                 blob.upload_from_string(b"")
-        elif strict and not self._get_blob(forcedir(root_path)):
-            raise errors.CreateFailed("Root path does not exist")
+        elif strict and self._get_blob(forcedir(root_path)) is None:
+            raise errors.CreateFailed("Root path \"{}\" does not exist".format(root_path))
 
     def __repr__(self) -> str:
         return _make_repr(
