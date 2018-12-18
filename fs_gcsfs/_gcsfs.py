@@ -78,13 +78,14 @@ class GCSFS(FS):
         except google.api_core.exceptions.Forbidden as err:
             raise CreateFailed("You don't have access to the bucket \"{}\"".format(self._bucket_name)) from err
 
-        if create:
-            root_marker = self._get_blob(forcedir(root_path))
-            if root_marker is None:
-                blob = self.bucket.blob(forcedir(root_path))
-                blob.upload_from_string(b"")
-        elif strict and self._get_blob(forcedir(root_path)) is None:
-            raise errors.CreateFailed("Root path \"{}\" does not exist".format(root_path))
+        if self._prefix != "":
+            if create:
+                root_marker = self._get_blob(self._prefix + GCSFS.DELIMITER)
+                if root_marker is None:
+                    blob = self.bucket.blob(self._prefix + GCSFS.DELIMITER)
+                    blob.upload_from_string(b"")
+            elif strict and self._get_blob(self._prefix + GCSFS.DELIMITER) is None:
+                raise errors.CreateFailed("Root path \"{}\" does not exist".format(root_path))
 
     def __repr__(self) -> str:
         return _make_repr(
