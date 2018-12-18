@@ -20,6 +20,13 @@ Possible types of changes are:
 Unreleased
 ----------
 
+0.4.1 - 18.12.2018
+------------------
+
+Fixed
+'''''
+- Fixed a bug where ``create=True`` in combination with an "empty-ish ``root_path`` like ``""`` ``"."`` or ``"/"`` would create a directory marker.
+
 
 0.4.0 - 11.12.2018
 ------------------
@@ -28,7 +35,6 @@ Added
 '''''
 - Implemented the ``create`` property on ``GCSFS`` and the corresponding opener. By default all new GCSFS instances have ``create=False`` (PyFilesystem default)
     which means they will raise a ``CreateFailed`` exception if ``root_path`` does not exist
-
 
 
 0.3.0 - 20.11.2018

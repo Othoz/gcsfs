@@ -117,6 +117,13 @@ def test_listdir_works_on_bucket_as_root_directory(client):
     assert directory in result
 
 
+@pytest.mark.parametrize("root_path", ["", ".", "/"])
+def test_create_property_does_not_create_file_if_emptyish_root_path(root_path, client):
+    """Regression test for a bug fixed in 0.4.1"""
+    gcs_fs = GCSFS(bucket_name=TEST_BUCKET, root_path=root_path, client=client, create=True)
+    assert gcs_fs.bucket.get_blob(root_path + GCSFS.DELIMITER) is None
+
+
 def test_fix_storage_adds_binary_blobs_with_empty_string_as_directory_marker(bucket, tmp_gcsfs):
     # Creating a 'nested' hierarchy of blobs without directory marker
     for path in ["foo/test", "foo/bar/test", "foo/baz/test", "foo/bar/egg/test"]:
