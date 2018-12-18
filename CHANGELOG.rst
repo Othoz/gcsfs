@@ -25,7 +25,7 @@ Unreleased
 
 Fixed
 '''''
-- Fixed a bug where ``create=True`` in combination with an "empty-ish ``root_path`` like ``""`` ``"."`` or ``"/"`` would create a directory marker.
+- Fixed a bug where ``create=True`` in combination with an "empty-ish ``root_path`` like ``""``, ``"."`` or ``"/"`` would create a directory marker.
 
 
 0.4.0 - 11.12.2018
