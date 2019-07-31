@@ -22,4 +22,9 @@ class GCSFSOpener(Opener):
         if not bucket_name:
             raise OpenerError("invalid bucket name in '{}'".format(fs_url))
 
-        return GCSFS(bucket_name, root_path=root_path, create=create)
+        if parse_result.params.get("strict") == "False":
+            strict = False
+        else:
+            strict = True
+
+        return GCSFS(bucket_name, root_path=root_path, create=create, strict=strict)

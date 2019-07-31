@@ -3,6 +3,7 @@ import unittest
 import uuid
 
 import pytest
+from fs import open_fs
 from fs.errors import IllegalBackReference, CreateFailed
 from fs.test import FSTestCases
 from google.cloud.storage import Client
@@ -161,3 +162,15 @@ def test_instantiation_fails_if_no_access_to_bucket():
 def test_instantiation_with_create_false_fails_for_non_existing_root_path():
     with pytest.raises(CreateFailed):
         GCSFS(bucket_name=TEST_BUCKET, root_path=str(uuid.uuid4()), create=False)
+
+
+@pytest.mark.parametrize("query_param, strict", [
+    ("", True),
+    ("nonExisting=True", True),
+    ("strict=True", True),
+    ("strict=False", False)
+])
+def test_open_fs_url_strict_parameter_works(query_param, strict):
+    fs = open_fs("gs://{}?{}".format(TEST_BUCKET, query_param))
+    assert fs.strict == strict
+

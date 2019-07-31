@@ -20,6 +20,14 @@ Possible types of changes are:
 Unreleased
 ----------
 
+0.4.2 - 30.08.2019
+------------------
+
+Fixed
+'''''
+- Fixed a bug where the url parameter ``strict`` was not considered by GCSFS, e.g. in ``open_fs("gs://bucket_name?strict=False")``
+
+
 0.4.1 - 18.12.2018
 ------------------
 
