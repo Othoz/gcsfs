@@ -173,4 +173,3 @@ def test_instantiation_with_create_false_fails_for_non_existing_root_path():
 def test_open_fs_url_strict_parameter_works(query_param, strict):
     fs = open_fs("gs://{}?{}".format(TEST_BUCKET, query_param))
     assert fs.strict == strict
-
