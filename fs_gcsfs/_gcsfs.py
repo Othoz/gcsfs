@@ -5,6 +5,7 @@ import itertools
 import logging
 import os
 import tempfile
+import mimetypes
 from typing import Optional, List, Union, Tuple, Iterator
 
 import google
@@ -310,7 +311,10 @@ class GCSFS(FS):
                 blob = self._get_blob(_key)
                 if not blob:
                     blob = self.bucket.blob(_key)
-                blob.upload_from_file(gcs_file.raw)
+                mime_type, encoding = mimetypes.guess_type(path)
+                if encoding is not None:
+                    mime_type = None
+                blob.upload_from_file(gcs_file.raw, content_type=mime_type)
             gcs_file.raw.close()
 
         if _mode.create:
