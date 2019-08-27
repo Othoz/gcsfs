@@ -1,6 +1,7 @@
 .idea
 __pycache__
 *.pyc
+.eggs
 
 # coverage reports
 .coverage

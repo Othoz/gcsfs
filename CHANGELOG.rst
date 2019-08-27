@@ -20,7 +20,17 @@ Possible types of changes are:
 Unreleased
 ----------
 
-0.4.2 - 30.08.2019
+
+1.0.0 - 27.08.2019
+------------------
+
+Changed
+'''''''
+- Instead of uploading all blobs as *application/octet-stream*, the MIME type is now guessed via ``mimetypes.guess_type()``.
+  This enables e.g. hotlinking images directly from GCS.
+
+
+0.4.2 - 30.07.2019
 ------------------
 
 Fixed
