@@ -2,8 +2,6 @@
 # borrowed and adapted from S3FS:
 # https://s3fs.readthedocs.io/en/latest/_modules/s3fs/mapping.html#S3Map
 from collections.abc import MutableMapping
-import os
-
 from ._gcsfs import GCSFS
 
 def split_path(path):
@@ -36,7 +34,7 @@ class GCSFSMap(MutableMapping):
         creates bucket if it does not yet exist
     """
 
-    def __init__(self, root, gcfs, check=False, create=False):
+    def __init__(self, root: str, gcfs: GCSFS, check=False, create=False):
         self.gcfs = gcfs
         self.root = root
         if check:
