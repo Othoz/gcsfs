@@ -20,11 +20,20 @@ Possible types of changes are:
 Unreleased
 ----------
 
+
+1.1.0 - 07.01.2020
+------------------
+
 Added
 '''''
 - ``GCSFS.get_mapper()`` which returns a ``GCSMap`` that wraps a ``GCSFS`` as a ``MutableMapping``.
   The keys of the mapping become files and the values (which must be bytes) the contents of those files.
   This is particularly useful to be used with libraries such as `xarray <http://xarray.pydata.org/>`_ or `zarr <https://zarr.readthedocs.io/>`_.
+
+Fixed
+'''''
+- ``GCSFS.fix_storage()`` no longer creates a directory marker if ``root_path`` is the actual root of the bucket.
+  Apart from not having any advantage, this caused subsequent ``GCSFS.fix_storage()`` calls as well as ``GCSFS.walk()`` to be stuck in endless loops.
 
 
 1.0.0 - 27.08.2019
