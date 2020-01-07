@@ -450,7 +450,7 @@ class GCSFS(FS):
 
         return _factory(self, path)
 
-    def get_mapping(self) -> "GCSMap":
+    def get_mapper(self) -> "GCSMap":
         """Returns a ``MutableMapping`` that represents the filesystem.
 
         The keys of the mapping become files and the values (which must be bytes) the contents of those files.
@@ -631,32 +631,34 @@ class GCSMap(MutableMapping):
 
     def __init__(self, gcsfs: GCSFS):
         self.gcsfs = gcsfs
-        self.root = ""
 
     def __getitem__(self, key: str) -> bytes:
         try:
-            return self.gcsfs.getbytes(key)
+            return self.gcsfs.getbytes(str(key))
         except errors.ResourceNotFound:
             raise KeyError(key)
 
-    def __setitem__(self, key: str, value: bytes) -> None:
-        self.gcsfs.makedirs(dirname(key), recreate=True)
-        self.gcsfs.setbytes(key, value)
+    def __setitem__(self, key: str, value: bytes):
+        self.gcsfs.makedirs(dirname(str(key)), recreate=True)
+        self.gcsfs.setbytes(str(key), bytes(value))
 
     def __delitem__(self, key):
-        self.gcsfs.remove(key)
+        self.gcsfs.remove(str(key))
 
     def __iter__(self) -> Iterator[str]:
-        for path, dirs, files in self.gcsfs.walk("."):
-            for file in files:
-                if file != "/":  # Skip directory markers
-                    yield join(path, file)
+        return self.keys()
 
     def __len__(self) -> int:
-        return sum(1 for _ in self.__iter__())
+        return sum(1 for _ in self.keys())
 
     def __contains__(self, key: str) -> bool:
-        return self.gcsfs.exists(key)
+        return self.gcsfs.exists(str(key))
+
+    def keys(self) -> Iterator[str]:
+        for path, dirs, files in self.gcsfs.walk("."):
+            for file in files:
+                if file.name != "/":  # Skip directory markers
+                    yield file.name  # join(path, file.name)
 
 
 def _make_repr(class_name, *args, **kwargs):
