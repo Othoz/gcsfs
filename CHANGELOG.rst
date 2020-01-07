@@ -28,12 +28,12 @@ Added
 '''''
 - ``GCSFS.get_mapper()`` which returns a ``GCSMap`` that wraps a ``GCSFS`` as a ``MutableMapping``.
   The keys of the mapping become files and the values (which must be bytes) the contents of those files.
-  This is particularly useful to be used with libraries such as `xarray <http://xarray.pydata.org/>`_ or `zarr <https://zarr.readthedocs.io/>`_.
+  This is particularly useful to be used with libraries such as `xarray <http://xarray.pydata.org/>`_ or `zarr <https://zarr.readthedocs.io/>`_. (#21)
 
 Fixed
 '''''
 - ``GCSFS.fix_storage()`` no longer creates a directory marker if ``root_path`` is the actual root of the bucket.
-  Apart from not having any advantage, this caused subsequent ``GCSFS.fix_storage()`` calls as well as ``GCSFS.walk()`` to be stuck in endless loops.
+  Apart from not having any advantage, this caused subsequent ``GCSFS.fix_storage()`` calls as well as ``GCSFS.walk()`` to be stuck in endless loops. (#19)
 
 
 1.0.0 - 27.08.2019
@@ -42,7 +42,7 @@ Fixed
 Changed
 '''''''
 - Instead of uploading all blobs as *application/octet-stream*, the MIME type is now guessed via ``mimetypes.guess_type()``.
-  This enables e.g. hotlinking images directly from GCS.
+  This enables e.g. hotlinking images directly from GCS. (#15)
 
 
 0.4.2 - 30.07.2019
@@ -50,7 +50,7 @@ Changed
 
 Fixed
 '''''
-- Fixed a bug where the url parameter ``strict`` was not considered by GCSFS, e.g. in ``open_fs("gs://bucket_name?strict=False")``
+- Fixed a bug where the url parameter ``strict`` was not considered by GCSFS, e.g. in ``open_fs("gs://bucket_name?strict=False")`` (#11)
 
 
 0.4.1 - 18.12.2018
@@ -58,7 +58,7 @@ Fixed
 
 Fixed
 '''''
-- Fixed a bug where ``create=True`` in combination with an "empty-ish ``root_path`` like ``""``, ``"."`` or ``"/"`` would create a directory marker.
+- Fixed a bug where ``create=True`` in combination with an empty-ish ``root_path`` like ``""``, ``"."`` or ``"/"`` would create a directory marker.
 
 
 0.4.0 - 11.12.2018
@@ -67,7 +67,7 @@ Fixed
 Added
 '''''
 - Implemented the ``create`` property on ``GCSFS`` and the corresponding opener. By default all new GCSFS instances have ``create=False`` (PyFilesystem default)
-    which means they will raise a ``CreateFailed`` exception if ``root_path`` does not exist
+    which means they will raise a ``CreateFailed`` exception if ``root_path`` does not exist (#8)
 
 
 0.3.0 - 20.11.2018
