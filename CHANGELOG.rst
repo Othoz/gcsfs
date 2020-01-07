@@ -20,6 +20,12 @@ Possible types of changes are:
 Unreleased
 ----------
 
+Added
+'''''
+- ``GCSFS.get_mapper()`` which returns a ``GCSMap`` that wraps a ``GCSFS`` as a ``MutableMapping``.
+  The keys of the mapping become files and the values (which must be bytes) the contents of those files.
+  This is particularly useful to be used with libraries such as `xarray <http://xarray.pydata.org/>`_ or `zarr <https://zarr.readthedocs.io/>`_.
+
 
 1.0.0 - 27.08.2019
 ------------------

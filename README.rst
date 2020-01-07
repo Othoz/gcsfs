@@ -16,10 +16,10 @@ A Python filesystem abstraction of Google Cloud Storage (GCS) implemented as a `
 .. image:: https://readthedocs.org/projects/fs-gcsfs/badge/?version=latest
     :target: https://fs-gcsfs.readthedocs.io/en/latest/?badge=latest
 
-.. image:: https://api.codacy.com/project/badge/Coverage/6377a6e321cd4ccf94dfd6f09456d9ce
+.. image:: https://api.codacy.com/project/badge/Coverage/f863cb8afe7943b5ba8c818bbae2e6d2
     :target: https://www.codacy.com/app/Othoz/gcsfs?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Othoz/gcsfs&amp;utm_campaign=Badge_Coverage
 
-.. image:: https://api.codacy.com/project/badge/Grade/6377a6e321cd4ccf94dfd6f09456d9ce
+.. image:: https://api.codacy.com/project/badge/Grade/f863cb8afe7943b5ba8c818bbae2e6d2
     :target: https://www.codacy.com/app/Othoz/gcsfs?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Othoz/gcsfs&amp;utm_campaign=Badge_Grade
 
 
