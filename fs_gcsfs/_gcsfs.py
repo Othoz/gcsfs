@@ -6,7 +6,7 @@ import logging
 import os
 import tempfile
 import mimetypes
-from typing import Optional, List, Union, Tuple, Iterator, MutableMapping
+from typing import Optional, List, Union, Tuple, Iterator, MutableMapping, Any
 
 import google
 from fs import ResourceType, errors, tools
@@ -477,7 +477,9 @@ class GCSFS(FS):
             while name != self.root_path:
                 all_dirs.add(name)
                 name = dirname(name)
-        all_dirs.add(self.root_path)
+
+        if forcedir(self.root_path) != "/":
+            all_dirs.add(self.root_path)
 
         unmarked_dirs = all_dirs.difference(marked_dirs)
         logger.info("{} directories in total".format(len(all_dirs)))
@@ -632,17 +634,17 @@ class GCSMap(MutableMapping):
     def __init__(self, gcsfs: GCSFS):
         self.gcsfs = gcsfs
 
-    def __getitem__(self, key: str) -> bytes:
+    def __getitem__(self, key: Any) -> bytes:
         try:
             return self.gcsfs.getbytes(str(key))
         except errors.ResourceNotFound:
             raise KeyError(key)
 
-    def __setitem__(self, key: str, value: bytes):
+    def __setitem__(self, key: Any, value: Any) -> None:
         self.gcsfs.makedirs(dirname(str(key)), recreate=True)
         self.gcsfs.setbytes(str(key), bytes(value))
 
-    def __delitem__(self, key):
+    def __delitem__(self, key) -> None:
         self.gcsfs.remove(str(key))
 
     def __iter__(self) -> Iterator[str]:
@@ -651,7 +653,7 @@ class GCSMap(MutableMapping):
     def __len__(self) -> int:
         return sum(1 for _ in self.keys())
 
-    def __contains__(self, key: str) -> bool:
+    def __contains__(self, key: Any) -> bool:
         return self.gcsfs.exists(str(key))
 
     def keys(self) -> Iterator[str]:
