@@ -6,7 +6,7 @@ import logging
 import os
 import tempfile
 import mimetypes
-from typing import Optional, List, Union, Tuple, Iterator
+from typing import Optional, List, Union, Tuple, Iterator, MutableMapping
 
 import google
 from fs import ResourceType, errors, tools
@@ -27,13 +27,13 @@ logger = logging.getLogger()
 
 
 class GCSFS(FS):
-    """A GCS filesystem for `PyFilesystem <https://pyfilesystem.org>`_
+    """A Google Cloud Storage filesystem for `PyFilesystem <https://pyfilesystem.org>`_.
 
-    This implementation is based on `S3FS <https://github.com/PyFilesystem/s3fs>`_
+    This implementation is based on `S3FS <https://github.com/PyFilesystem/s3fs>`_.
 
     Args:
         bucket_name: The GCS bucket name.
-        root_path: The root directory within the GCS Bucket
+        root_path: The root directory within the GCS Bucket.
         create: Whether to create ``root_path`` on initialization or not. If ``root_path`` does not yet exist and ``create=False`` a ``CreateFailed``
             exception will be raised. To disable ``root_path`` validation entirely set ``strict=False``.
         client: A :class:`google.storage.Client` exposing the google storage API.
@@ -450,6 +450,14 @@ class GCSFS(FS):
 
         return _factory(self, path)
 
+    def get_mapper(self) -> "GCSMap":
+        """Returns a ``MutableMapping`` that represents the filesystem.
+
+        The keys of the mapping become files and the values (which must be bytes) the contents of those files.
+        This is particularly useful to be used with libraries such as `xarray <http://xarray.pydata.org/>`_ or `zarr <https://zarr.readthedocs.io/>`_.
+        """
+        return GCSMap(self)
+
     def fix_storage(self) -> None:  # TODO test
         """Utility function that walks the entire `root_path` and makes sure that all intermediate directories are correctly marked with empty blobs.
 
@@ -494,7 +502,9 @@ class GCSFS(FS):
 
 
 class GCSFile(io.IOBase):
-    """Proxy for a GCS blob. Identical to S3File from https://github.com/PyFilesystem/s3fs
+    """Proxy for a GCS blob.
+
+    Identical to S3File from https://github.com/PyFilesystem/s3fs.
 
     Note:
         Instead of performing all operations directly on the cloud (which is in some cases not even possible)
@@ -607,6 +617,48 @@ class GCSFile(io.IOBase):
             size = self._f.tell()
         self._f.truncate(size)
         return size
+
+
+class GCSMap(MutableMapping):
+    """Wraps a ``class:GCSFS`` as a ``MutableMapping``.
+
+    The keys of the mapping become files and the values (which must be bytes) the contents of those files.
+    This is particularly useful to be used with libraries such as `xarray <http://xarray.pydata.org/>`_ or `zarr <https://zarr.readthedocs.io/>`_.
+
+    Args:
+        gcsfs: The ``class:GCSFS`` to wrap.
+    """
+
+    def __init__(self, gcsfs: GCSFS):
+        self.gcsfs = gcsfs
+
+    def __getitem__(self, key: str) -> bytes:
+        try:
+            return self.gcsfs.getbytes(str(key))
+        except errors.ResourceNotFound:
+            raise KeyError(key)
+
+    def __setitem__(self, key: str, value: bytes):
+        self.gcsfs.makedirs(dirname(str(key)), recreate=True)
+        self.gcsfs.setbytes(str(key), bytes(value))
+
+    def __delitem__(self, key):
+        self.gcsfs.remove(str(key))
+
+    def __iter__(self) -> Iterator[str]:
+        return self.keys()
+
+    def __len__(self) -> int:
+        return sum(1 for _ in self.keys())
+
+    def __contains__(self, key: str) -> bool:
+        return self.gcsfs.exists(str(key))
+
+    def keys(self) -> Iterator[str]:
+        for path, dirs, files in self.gcsfs.walk("."):
+            for file in files:
+                if file.name != "/":  # Skip directory markers
+                    yield file.name  # join(path, file.name)
 
 
 def _make_repr(class_name, *args, **kwargs):

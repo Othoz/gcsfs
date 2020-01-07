@@ -27,9 +27,18 @@ For a full reference of all available methods of GCSFS visit the documentation o
 `fs.base.FS <https://pyfilesystem2.readthedocs.io/en/latest/reference/base.html>`__!
 
 
+GCSFS
+-----
+
 .. autoclass:: fs_gcsfs.GCSFS
 
     .. automethod:: fs_gcsfs.GCSFS.fix_storage
+
+
+GCSMap
+------
+
+.. automethod:: fs_gcsfs.GCSFS.get_mapper
 
 
 Powered By
