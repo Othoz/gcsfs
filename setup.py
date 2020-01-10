@@ -28,6 +28,7 @@ if __name__ == "__main__":
         install_requires=[
             "fs~=2.0",
             "google-cloud-storage~=1.0",
+            "numpy~=1.18"
         ],
         entry_points={
             "fs.opener": [
