@@ -70,7 +70,15 @@ Alternatively you can use a `FS URL <https://pyfilesystem2.readthedocs.io/en/lat
 .. code-block:: python
 
     from fs import open_fs
-    gcsfs = open_fs("gs://mybucket/root_path?strict=False")
+    gcsfs = open_fs("gs://mybucket/root_path?project=test&api_endpoint=http%3A//localhost%3A8888&strict=False")
+
+
+Supported query parameters are:
+
+- `project` (str): Google Cloud project to use
+- `api_endpoint` (str): URL-encoded endpoint that will be passed to the GCS client's `client_options <https://googleapis.dev/python/google-api-core/latest/client_options.html#google.api_core.client_options.ClientOptions>`__
+- `strict` ("True" or "False"): Whether GCSFS will be opened in strict mode
+
 
 You can use GCSFS like your local filesystem:
 

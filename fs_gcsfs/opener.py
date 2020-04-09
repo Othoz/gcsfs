@@ -3,6 +3,7 @@
 
 __all__ = ['GCSFSOpener']
 
+from google.cloud.storage import Client
 from fs.opener import Opener
 from fs.opener.errors import OpenerError
 from fs.path import iteratepath, join
@@ -27,4 +28,12 @@ class GCSFSOpener(Opener):
         else:
             strict = True
 
-        return GCSFS(bucket_name, root_path=root_path, create=create, strict=strict)
+        client = Client()
+        project = parse_result.params.get("project")
+        if project:
+            client.project = project
+        api_endpoint = parse_result.params.get("api_endpoint")
+        if api_endpoint:
+            client.client_options = {"api_endpoint": api_endpoint}
+
+        return GCSFS(bucket_name, root_path=root_path, create=create, client=client, strict=strict)

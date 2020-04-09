@@ -154,3 +154,17 @@ def test_instantiation_with_create_false_fails_for_non_existing_root_path():
 def test_open_fs_url_strict_parameter_works(query_param, strict):
     fs = open_fs("gs://{}?{}".format(TEST_BUCKET, query_param))
     assert fs.strict == strict
+
+
+@pytest.mark.parametrize("query_param, project", [
+    ("", Client().project),
+    ("project=test", "test"),
+])
+def test_open_fs_project_parameter_works(query_param, project):
+    fs = open_fs("gs://{}?{}".format(TEST_BUCKET, query_param))
+    assert fs.client.project == project
+
+
+def test_open_fs_api_endpoint_parameter_works():
+    fs = open_fs("gs://{}?api_endpoint=http%3A//localhost%3A8888".format(TEST_BUCKET))
+    assert fs.client.client_options == {"api_endpoint": "http://localhost:8888"}

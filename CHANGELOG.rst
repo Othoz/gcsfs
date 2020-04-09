@@ -21,6 +21,14 @@ Unreleased
 ----------
 
 
+1.2.0 - 01.04.2020
+------------------
+
+Added
+'''''
+- ``open_fs`` now supports providing a custom "project" and "api_endpoint", e.g. ``open_fs("gs://bucket_name?project=test")`` or ``open_fs("gs://bucket_name?api_endpoint=http%3A//localhost%3A8888")`` (#26)
+
+
 1.1.0 - 07.01.2020
 ------------------
 
