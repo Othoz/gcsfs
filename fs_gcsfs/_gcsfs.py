@@ -610,7 +610,7 @@ class GCSFile(io.IOBase):
 
     def write(self, b):
         if not self.__mode.writing:
-            raise IOError("not open for reading")
+            raise IOError("not open for writing")
         self._f.write(b)
         return len(b)
 
