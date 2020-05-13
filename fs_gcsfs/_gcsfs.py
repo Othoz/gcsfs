@@ -352,7 +352,7 @@ class GCSFS(FS):
         gcs_file = GCSFile.factory(path, _mode, on_close=on_close)
         blob = self._get_blob(_key)
         if not blob:
-            raise errors.ResourceNotFound
+            raise errors.ResourceNotFound(path)
 
         blob.download_to_file(gcs_file.raw)
         gcs_file.seek(0)
