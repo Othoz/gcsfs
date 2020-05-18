@@ -72,12 +72,7 @@ class GCSFS(FS):
         if self.client is None:
             self.client = Client()
 
-        try:
-            self.bucket = self.client.get_bucket(self._bucket_name)
-        except google.api_core.exceptions.NotFound as err:
-            raise CreateFailed("The bucket \"{}\" does not seem to exist".format(self._bucket_name)) from err
-        except google.api_core.exceptions.Forbidden as err:
-            raise CreateFailed("You don't have access to the bucket \"{}\"".format(self._bucket_name)) from err
+        self.bucket = self.client.bucket(self._bucket_name)
 
         if self._prefix != "":
             if create:

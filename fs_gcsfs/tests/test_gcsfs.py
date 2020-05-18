@@ -38,8 +38,10 @@ class TestGCSFS(FSTestCases, unittest.TestCase):
 def client_mock():
     class ClientMock:
         """A client mock class to instantiate GCSFS without making any requests in the constructor"""
-        def get_bucket(self, _):
+
+        def bucket(self, _):
             pass
+
     return ClientMock()
 
 
@@ -133,11 +135,6 @@ def test_fix_storage_does_not_overwrite_existing_directory_markers_with_custom_c
     gcsfs.fix_storage()
 
     assert blob.download_as_string() == content
-
-
-def test_instantiation_fails_if_no_access_to_bucket():
-    with pytest.raises(CreateFailed):
-        GCSFS(bucket_name=str(uuid.uuid4()))
 
 
 def test_instantiation_with_create_false_fails_for_non_existing_root_path():
