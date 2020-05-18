@@ -10,7 +10,7 @@ install:
 
 script:
   - flake8
-  - ./run-tests.sh
+  - .travis/run-tests.sh
 
 deploy:
   provider: pypi
