@@ -6,7 +6,7 @@ python:
 
 before_install:
   # We only run the test suite when building the repository under Othoz/gcsfs because only here we have access too the environment variables to decrypt the GCS service account key
-  - 'if [ "$TRAVIS_REPO_SLUG" = "Othoz/gcsfs" ]; then openssl aes-256-cbc -K $encrypted_b8e3bf9ce0e9_key -iv $encrypted_b8e3bf9ce0e9_iv -in .travis/service-account-key.json.enc -out $HOME/service-account-key.json -d; fi'
+  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then openssl aes-256-cbc -K $encrypted_b8e3bf9ce0e9_key -iv $encrypted_b8e3bf9ce0e9_iv -in .travis/service-account-key.json.enc -out $HOME/service-account-key.json -d; fi'
   - export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account-key.json
   - export TEST_BUCKET=othoz-gcsfs-tests
 
@@ -16,7 +16,7 @@ install:
 
 script:
   - flake8
-  - 'if [ "$TRAVIS_REPO_SLUG" = "Othoz/gcsfs" ]; then pytest --cov=fs_gcsfs --cov-branch --cov-report=xml --numprocesses=16; fi'
+  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then pytest --cov=fs_gcsfs --cov-branch --cov-report=xml --numprocesses=16; fi'
 
 deploy:
   provider: pypi
