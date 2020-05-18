@@ -2,7 +2,8 @@
 set -ev
 
 echo TRAVIS_REPO_SLUG is set to "$TRAVIS_REPO_SLUG"
-if [ "$TRAVIS_REPO_SLUG" = "Othoz/gcsfs" ]; then
+echo TRAVIS_PULL_REQUEST is set to "$TRAVIS_PULL_REQUEST"
+if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
   echo PR is an internal PR coming from "$TRAVIS_REPO_SLUG".
   openssl aes-256-cbc -K $encrypted_335424c81256_key -iv $encrypted_335424c81256_iv -in .travis/service-account-key.json.enc -out $HOME/service-account-key.json -d
   export GOOGLE_APPLICATION_CREDENTIALS=$HOME/service-account-key.json
