@@ -20,6 +20,13 @@ Possible types of changes are:
 Unreleased
 ----------
 
+1.3.0 - 20.05.2020
+------------------
+
+Changed
+'''''''
+- Removed the (non-required) call to ``get_bucket()`` from the constructor of ``GCSFS``. This avoids the need for storage.buckets.get permissions on that bucket and thus now allows users to simplify access management by using tight, predefined IAM roles.
+  This change has two implications: a) the constructor is now a bit faster as one less RPC is performed; b) the error message in case a bucket does not exist is slightly less informative.
 
 1.2.0 - 01.04.2020
 ------------------
