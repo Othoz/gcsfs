@@ -11,7 +11,6 @@ from typing import Optional, List, Union, Tuple, Iterator, MutableMapping, Any
 import google
 from fs import ResourceType, errors, tools
 from fs.base import FS
-from fs.errors import CreateFailed
 from fs.info import Info
 from fs.mode import Mode
 from fs.path import basename, dirname, forcedir, normpath, relpath, join
