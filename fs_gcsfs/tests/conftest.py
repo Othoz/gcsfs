@@ -14,7 +14,7 @@ def client():
 
 @pytest.fixture(scope="module")
 def bucket(client):
-    return client.get_bucket(os.environ['TEST_BUCKET'])
+    return client.bucket(os.environ['TEST_BUCKET'])
 
 
 @pytest.fixture(scope="function")

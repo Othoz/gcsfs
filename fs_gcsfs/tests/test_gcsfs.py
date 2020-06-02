@@ -18,7 +18,7 @@ class TestGCSFS(FSTestCases, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.client = Client()
-        cls.bucket = cls.client.get_bucket(TEST_BUCKET)
+        cls.bucket = cls.client.bucket(TEST_BUCKET)
         super().setUpClass()
 
     def setUp(self):

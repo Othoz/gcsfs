@@ -20,6 +20,15 @@ Possible types of changes are:
 Unreleased
 ----------
 
+Added
+'''''
+- Experimental: Clients now automatically retry GCS requests that return with "503 Service Unavailable" or "504 Gateway Timeout.
+
+Fixed
+'''''
+- Some tests were still calling ``get_bucket()`` from the constructor of ``GCSFS``.
+
+
 1.3.0 - 20.05.2020
 ------------------
 
