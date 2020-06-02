@@ -19,6 +19,9 @@ from fs.subfs import SubFS
 from fs.time import datetime_to_epoch
 from google.cloud.storage import Client
 from google.cloud.storage.blob import Blob
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
 
 __all__ = ["GCSFS"]
 
@@ -57,6 +60,7 @@ class GCSFS(FS):
                  root_path: str = None,
                  create: bool = False,
                  client: Client = None,
+                 retry: int = 5,
                  strict: bool = True):
         super().__init__()
         self._bucket_name = bucket_name
@@ -70,6 +74,10 @@ class GCSFS(FS):
         self.client = client
         if self.client is None:
             self.client = Client()
+
+        if retry:
+            adapter = HTTPAdapter(max_retries=Retry(total=retry, status_forcelist=[429, 503, 504], method_whitelist=False))
+            self.client._http.mount("https://", adapter)
 
         self.bucket = self.client.bucket(self._bucket_name)
 
