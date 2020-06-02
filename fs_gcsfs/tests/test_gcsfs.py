@@ -3,6 +3,7 @@ import unittest
 import uuid
 
 import pytest
+import responses
 from fs import open_fs
 from fs.errors import IllegalBackReference, CreateFailed
 from fs.test import FSTestCases
@@ -18,7 +19,7 @@ class TestGCSFS(FSTestCases, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.client = Client()
-        cls.bucket = cls.client.get_bucket(TEST_BUCKET)
+        cls.bucket = cls.client.bucket(TEST_BUCKET)
         super().setUpClass()
 
     def setUp(self):
