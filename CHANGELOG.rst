@@ -20,6 +20,18 @@ Possible types of changes are:
 Unreleased
 ----------
 
+1.4.0 - 12.06.2020
+------------------
+
+Changed
+'''''''
+- The underlying HTTP client is now configured to automatically retry requests that return a status code of "429 Too Many Requests", "502 Bad Gateway", "503 Service Unavailable" and "504 Gateway Timeout".
+
+Fixed
+'''''
+- Some tests were still calling ``get_bucket()`` from the constructor of ``GCSFS``.
+
+
 1.3.0 - 20.05.2020
 ------------------
 

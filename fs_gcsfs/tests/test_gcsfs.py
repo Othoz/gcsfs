@@ -1,6 +1,7 @@
 import os
 import unittest
 import uuid
+from unittest import mock
 
 import pytest
 from fs import open_fs
@@ -18,7 +19,7 @@ class TestGCSFS(FSTestCases, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.client = Client()
-        cls.bucket = cls.client.get_bucket(TEST_BUCKET)
+        cls.bucket = cls.client.bucket(TEST_BUCKET)
         super().setUpClass()
 
     def setUp(self):
@@ -41,6 +42,10 @@ def client_mock():
 
         def bucket(self, _):
             pass
+
+        @property
+        def _http(self):
+            return mock.MagicMock()
 
     return ClientMock()
 
