@@ -20,9 +20,9 @@ Possible types of changes are:
 Unreleased
 ----------
 
-Added
-'''''
-- Experimental: Clients now automatically retry GCS requests that return with "503 Service Unavailable" or "504 Gateway Timeout.
+Changed
+'''''''
+- The underlying HTTP client is now configured to automatically retry requests that return a status code of "429 Too Many Requests", "502 Bad Gateway", "503 Service Unavailable" and "504 Gateway Timeout".
 
 Fixed
 '''''
