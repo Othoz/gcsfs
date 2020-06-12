@@ -74,7 +74,7 @@ class GCSFS(FS):
         self.client = client
         if self.client is None:
             self.client = Client()
-        
+
         if retry:
             adapter = HTTPAdapter(max_retries=Retry(total=retry,
                                                     status_forcelist=[429, 502, 503, 504],
