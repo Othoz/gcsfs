@@ -1,6 +1,7 @@
 import os
 import unittest
 import uuid
+from unittest import mock
 
 import pytest
 from fs import open_fs
@@ -41,6 +42,10 @@ def client_mock():
 
         def bucket(self, _):
             pass
+
+        @property
+        def _http(self):
+            return mock.MagicMock()
 
     return ClientMock()
 
