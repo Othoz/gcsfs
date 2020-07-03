@@ -611,7 +611,7 @@ class GCSFile(io.IOBase):
         return self._f.readall()
 
     def readinto(self, b):
-        return self._f.readinto()
+        return self._f.readinto(b)
 
     def write(self, b):
         if not self.__mode.writing:
