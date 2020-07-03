@@ -27,8 +27,7 @@ if __name__ == "__main__":
         setup_requires=['setuptools_scm'],
         install_requires=[
             "fs~=2.0",
-            "google-cloud-storage~=1.0",
-            "numpy~=1.18"
+            "google-cloud-storage~=1.0"
         ],
         entry_points={
             "fs.opener": [
