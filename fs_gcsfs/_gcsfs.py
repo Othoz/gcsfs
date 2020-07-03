@@ -11,7 +11,6 @@ from typing import Optional, List, Union, Tuple, Iterator, MutableMapping, Any
 import google
 from fs import ResourceType, errors, tools
 from fs.base import FS
-from fs.errors import CreateFailed
 from fs.info import Info
 from fs.mode import Mode
 from fs.path import basename, dirname, forcedir, normpath, relpath, join
@@ -20,6 +19,9 @@ from fs.subfs import SubFS
 from fs.time import datetime_to_epoch
 from google.cloud.storage import Client
 from google.cloud.storage.blob import Blob
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
 
 __all__ = ["GCSFS"]
 
@@ -58,6 +60,7 @@ class GCSFS(FS):
                  root_path: str = None,
                  create: bool = False,
                  client: Client = None,
+                 retry: int = 5,
                  strict: bool = True):
         super().__init__()
         self._bucket_name = bucket_name
@@ -72,12 +75,14 @@ class GCSFS(FS):
         if self.client is None:
             self.client = Client()
 
-        try:
-            self.bucket = self.client.get_bucket(self._bucket_name)
-        except google.api_core.exceptions.NotFound as err:
-            raise CreateFailed("The bucket \"{}\" does not seem to exist".format(self._bucket_name)) from err
-        except google.api_core.exceptions.Forbidden as err:
-            raise CreateFailed("You don't have access to the bucket \"{}\"".format(self._bucket_name)) from err
+        if retry:
+            adapter = HTTPAdapter(max_retries=Retry(total=retry,
+                                                    status_forcelist=[429, 502, 503, 504],
+                                                    method_whitelist=False,  # retry on any HTTP method
+                                                    backoff_factor=0.5))
+            self.client._http.mount("https://", adapter)
+
+        self.bucket = self.client.bucket(self._bucket_name)
 
         if self._prefix != "":
             if create:
@@ -352,7 +357,7 @@ class GCSFS(FS):
         gcs_file = GCSFile.factory(path, _mode, on_close=on_close)
         blob = self._get_blob(_key)
         if not blob:
-            raise errors.ResourceNotFound
+            raise errors.ResourceNotFound(path)
 
         blob.download_to_file(gcs_file.raw)
         gcs_file.seek(0)
@@ -610,7 +615,7 @@ class GCSFile(io.IOBase):
 
     def write(self, b):
         if not self.__mode.writing:
-            raise IOError("not open for reading")
+            raise IOError("not open for writing")
         self._f.write(b)
         return len(b)
 

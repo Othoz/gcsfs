@@ -20,6 +20,33 @@ Possible types of changes are:
 Unreleased
 ----------
 
+1.4.0 - 12.06.2020
+------------------
+
+Changed
+'''''''
+- The underlying HTTP client is now configured to automatically retry requests that return a status code of "429 Too Many Requests", "502 Bad Gateway", "503 Service Unavailable" and "504 Gateway Timeout".
+
+Fixed
+'''''
+- Some tests were still calling ``get_bucket()`` from the constructor of ``GCSFS``.
+
+
+1.3.0 - 20.05.2020
+------------------
+
+Changed
+'''''''
+- Removed the (non-required) call to ``get_bucket()`` from the constructor of ``GCSFS``. This avoids the need for storage.buckets.get permissions on that bucket and thus now allows users to simplify access management by using tight, predefined IAM roles.
+  This change has two implications: a) the constructor is now a bit faster as one less RPC is performed; b) the error message in case a bucket does not exist is slightly less informative.
+
+1.2.0 - 01.04.2020
+------------------
+
+Added
+'''''
+- ``open_fs`` now supports providing a custom "project" and "api_endpoint", e.g. ``open_fs("gs://bucket_name?project=test")`` or ``open_fs("gs://bucket_name?api_endpoint=http%3A//localhost%3A8888")`` (#26)
+
 
 1.1.0 - 07.01.2020
 ------------------

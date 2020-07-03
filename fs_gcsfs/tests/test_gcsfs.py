@@ -2,6 +2,7 @@ import os
 import unittest
 import uuid
 from decimal import Decimal
+from unittest import mock
 
 import numpy as np
 import pytest
@@ -20,7 +21,7 @@ class TestGCSFS(FSTestCases, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.client = Client()
-        cls.bucket = cls.client.get_bucket(TEST_BUCKET)
+        cls.bucket = cls.client.bucket(TEST_BUCKET)
         super().setUpClass()
 
     def setUp(self):
@@ -70,8 +71,12 @@ def client_mock():
     class ClientMock:
         """A client mock class to instantiate GCSFS without making any requests in the constructor"""
 
-        def get_bucket(self, _):
+        def bucket(self, _):
             pass
+
+        @property
+        def _http(self):
+            return mock.MagicMock()
 
     return ClientMock()
 
@@ -168,11 +173,6 @@ def test_fix_storage_does_not_overwrite_existing_directory_markers_with_custom_c
     assert blob.download_as_string() == content
 
 
-def test_instantiation_fails_if_no_access_to_bucket():
-    with pytest.raises(CreateFailed):
-        GCSFS(bucket_name=str(uuid.uuid4()))
-
-
 def test_instantiation_with_create_false_fails_for_non_existing_root_path():
     with pytest.raises(CreateFailed):
         GCSFS(bucket_name=TEST_BUCKET, root_path=str(uuid.uuid4()), create=False)
@@ -187,3 +187,17 @@ def test_instantiation_with_create_false_fails_for_non_existing_root_path():
 def test_open_fs_url_strict_parameter_works(query_param, strict):
     fs = open_fs("gs://{}?{}".format(TEST_BUCKET, query_param))
     assert fs.strict == strict
+
+
+@pytest.mark.parametrize("query_param, project", [
+    ("", Client().project),
+    ("project=test", "test"),
+])
+def test_open_fs_project_parameter_works(query_param, project):
+    fs = open_fs("gs://{}?{}".format(TEST_BUCKET, query_param))
+    assert fs.client.project == project
+
+
+def test_open_fs_api_endpoint_parameter_works():
+    fs = open_fs("gs://{}?api_endpoint=http%3A//localhost%3A8888".format(TEST_BUCKET))
+    assert fs.client.client_options == {"api_endpoint": "http://localhost:8888"}

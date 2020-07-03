@@ -70,7 +70,15 @@ Alternatively you can use a `FS URL <https://pyfilesystem2.readthedocs.io/en/lat
 .. code-block:: python
 
     from fs import open_fs
-    gcsfs = open_fs("gs://mybucket/root_path?strict=False")
+    gcsfs = open_fs("gs://mybucket/root_path?project=test&api_endpoint=http%3A//localhost%3A8888&strict=False")
+
+
+Supported query parameters are:
+
+- `project` (str): Google Cloud project to use
+- `api_endpoint` (str): URL-encoded endpoint that will be passed to the GCS client's `client_options <https://googleapis.dev/python/google-api-core/latest/client_options.html#google.api_core.client_options.ClientOptions>`__
+- `strict` ("True" or "False"): Whether GCSFS will be opened in strict mode
+
 
 You can use GCSFS like your local filesystem:
 
@@ -134,21 +142,26 @@ This will create a virtualenv with all packages and dev-packages installed.
 
 Tests
 -----
-All CI tests run against an actual GCS bucket provided by `Othoz <http://othoz.com/>`__. In order to run the tests against your own bucket,
+All CI tests run against an actual GCS bucket provided by `Othoz <http://othoz.com/>`__.
+
+In order to run the tests against your own bucket,
 make sure to set up a `Service Account <https://cloud.google.com/iam/docs/service-accounts>`__ with all necessary permissions:
 
-- storage.buckets.get
 - storage.objects.get
 - storage.objects.list
 - storage.objects.create
 - storage.objects.update
 - storage.objects.delete
 
+All five permissions listed above are e.g. included in the `predefined Cloud Storage IAM Role <https://cloud.google.com/storage/docs/access-control/iam-roles>`__ ``roles/storage.objectAdmin``.
+
 Expose your bucket name as an environment variable ``$TEST_BUCKET`` and run the tests via::
 
     $ pipenv run pytest
 
-Note that the tests mostly wait for I/O, therefore it makes sense to highly parallelize them with `xdist <https://github.com/pytest-dev/pytest-xdist>`__.
+Note that the tests mostly wait for I/O, therefore it makes sense to highly parallelize them with `xdist <https://github.com/pytest-dev/pytest-xdist>`__, e.g. by running the tests with::
+
+    $ pipenv run pytest -n 10
 
 
 Credits
