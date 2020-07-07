@@ -150,6 +150,9 @@ def test_instantiation_with_create_false_fails_for_non_existing_root_path():
 
 
 def test_gcsfile_readinto_works_correctly_with_numpy_load(gcsfs):
+    # Note: this is a regression test that previously failed with GCSFS <=1.4.0 due to a bug in
+    # GCSFile.readinto() that caused an exception to be raised. The test thus does not require explicit
+    # asserts, it purely verifies that the exception doesn't get raised anymore.
     a = np.random.choice([Decimal("1.0"), Decimal("2.22"), Decimal("3.1")], size=(100, 10))
     with gcsfs.open("foo.npy", "wb") as f:
         np.save(f, a)
