@@ -37,35 +37,6 @@ class TestGCSFS(FSTestCases, unittest.TestCase):
         return GCSFS(bucket_name=TEST_BUCKET, root_path=self.root_path, client=self.client, create=True)
 
 
-class TestReadinto(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        cls.client = Client()
-        cls.bucket = cls.client.get_bucket(TEST_BUCKET)
-        super().setUpClass()
-
-    def setUp(self):
-        self.root_path = "gcsfs/" + str(uuid.uuid4())
-        super().setUp()
-
-    def tearDown(self):
-        for blob in self.bucket.list_blobs(prefix=self.root_path):
-            blob.delete()
-
-    def make_fs(self):
-        return GCSFS(bucket_name=TEST_BUCKET, root_path=self.root_path, client=self.client, create=True)
-
-    def test_readinto(self):
-        fs = self.make_fs()
-        a = np.random.choice([Decimal("1.0"), Decimal("2.22"), Decimal("3.1")], size=(100, 10))
-        with fs.open("foo.npy", "wb") as f:
-            np.save(f, a)
-
-        with fs.open("foo.npy", "rb") as f:
-            np.load(f, allow_pickle=True)
-
-
 @pytest.fixture(scope="module")
 def client_mock():
     class ClientMock:
@@ -176,6 +147,17 @@ def test_fix_storage_does_not_overwrite_existing_directory_markers_with_custom_c
 def test_instantiation_with_create_false_fails_for_non_existing_root_path():
     with pytest.raises(CreateFailed):
         GCSFS(bucket_name=TEST_BUCKET, root_path=str(uuid.uuid4()), create=False)
+
+
+def test_gcsfile_readinto_works_correctly_with_numpy_load(gcsfs):
+    # Note: this is a regression test that previously failed with GCSFS <=1.4.0 due to a bug in
+    # GCSFile.readinto() that caused an exception to be raised. The test thus does not require explicit
+    # asserts, it purely verifies that the exception doesn't get raised anymore.
+    a = np.random.choice([Decimal("1.0"), Decimal("2.22"), Decimal("3.1")], size=(100, 10))
+    with gcsfs.open("foo.npy", "wb") as f:
+        np.save(f, a)
+    with gcsfs.open("foo.npy", "rb") as f:
+        np.load(f, allow_pickle=True)
 
 
 @pytest.mark.parametrize("query_param, strict", [

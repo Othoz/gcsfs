@@ -20,6 +20,15 @@ Possible types of changes are:
 Unreleased
 ----------
 
+
+1.4.1 - 06.07.2020
+------------------
+
+Fixed
+'''''
+- Fixed a bug in ``GCSFile.readinto`` that surfaced for Python >=3.8 when reading data via e.g. ``numpy.load``.
+
+
 1.4.0 - 12.06.2020
 ------------------
 

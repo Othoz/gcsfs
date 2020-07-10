@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [dev-packages]
+numpy = "*"  # one test verifies that GCSFS is compatible with numpy.load()/save() and thus requires numpy as a dep
 flake8 = "*"
 pytest = "*"
 pytest-cov = "*"
