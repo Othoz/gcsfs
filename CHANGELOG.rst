@@ -26,7 +26,7 @@ Unreleased
 
 Fixed
 '''''
-- Fixed a bug in ``GCSFile.readinto`` that surfaced for Python >=3.8 when reading data via e.g. ``numpy.load``.
+- Fixed a bug in ``GCSFile.readinto`` that surfaced for Python >=3.8 when reading data via e.g. ``numpy.load`` (#24, #36)
 
 
 1.4.0 - 12.06.2020
@@ -103,7 +103,7 @@ Fixed
 Added
 '''''
 - Implemented the ``create`` property on ``GCSFS`` and the corresponding opener. By default all new GCSFS instances have ``create=False`` (PyFilesystem default)
-    which means they will raise a ``CreateFailed`` exception if ``root_path`` does not exist (#8)
+  which means they will raise a ``CreateFailed`` exception if ``root_path`` does not exist (#8)
 
 
 0.3.0 - 20.11.2018
