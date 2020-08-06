@@ -21,5 +21,3 @@ deploy:
   on:
     tags: true
 
-after_success:
-  - python-codacy-coverage -r coverage.xml

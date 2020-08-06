@@ -16,12 +16,6 @@ A Python filesystem abstraction of Google Cloud Storage (GCS) implemented as a `
 .. image:: https://readthedocs.org/projects/fs-gcsfs/badge/?version=latest
     :target: https://fs-gcsfs.readthedocs.io/en/latest/?badge=latest
 
-.. image:: https://api.codacy.com/project/badge/Coverage/f863cb8afe7943b5ba8c818bbae2e6d2
-    :target: https://www.codacy.com/app/Othoz/gcsfs?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Othoz/gcsfs&amp;utm_campaign=Badge_Coverage
-
-.. image:: https://api.codacy.com/project/badge/Grade/f863cb8afe7943b5ba8c818bbae2e6d2
-    :target: https://www.codacy.com/app/Othoz/gcsfs?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Othoz/gcsfs&amp;utm_campaign=Badge_Grade
-
 
 With GCSFS, you can interact with `Google Cloud Storage <https://cloud.google.com/storage/>`__ as if it was a regular filesystem.
 
