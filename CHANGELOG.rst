@@ -20,6 +20,12 @@ Possible types of changes are:
 Unreleased
 ----------
 
+1.4.2 - 24.02.2021
+------------------
+
+Fixed
+'''''
+- Changed keyword argument of underlying dependency urllib3 from `method_whitelist` to `allowed_methods` to avoid deprecation warning (#39)
 
 1.4.1 - 06.07.2020
 ------------------
