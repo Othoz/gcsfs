@@ -602,6 +602,10 @@ class GCSFile(io.IOBase):
     def writelines(self, lines):
         return self._f.writelines(lines)
 
+    @property
+    def mode(self):
+        return self.__mode.to_platform_bin()
+
     def read(self, n=-1):
         if not self.__mode.reading:
             raise IOError("not open for reading")
