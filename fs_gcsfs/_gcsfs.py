@@ -78,7 +78,7 @@ class GCSFS(FS):
         if retry:
             adapter = HTTPAdapter(max_retries=Retry(total=retry,
                                                     status_forcelist=[429, 502, 503, 504],
-                                                    method_whitelist=False,  # retry on any HTTP method
+                                                    allowed_methods=False,  # retry on any HTTP method
                                                     backoff_factor=0.5))
             self.client._http.mount("https://", adapter)
 
