@@ -9,6 +9,7 @@ import mimetypes
 from typing import Optional, List, Union, Tuple, Iterator, MutableMapping, Any
 
 import google
+import urllib3
 from fs import ResourceType, errors, tools
 from fs.base import FS
 from fs.info import Info
@@ -19,6 +20,7 @@ from fs.subfs import SubFS
 from fs.time import datetime_to_epoch
 from google.cloud.storage import Client
 from google.cloud.storage.blob import Blob
+from packaging import version
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
@@ -76,10 +78,16 @@ class GCSFS(FS):
             self.client = Client()
 
         if retry:
-            adapter = HTTPAdapter(max_retries=Retry(total=retry,
-                                                    status_forcelist=[429, 502, 503, 504],
-                                                    allowed_methods=False,  # retry on any HTTP method
-                                                    backoff_factor=0.5))
+            # urllib3: "method_whitelist" was deprecated in favour of "allowed_methods" in version 1.26.0
+            # Ensure compatibility with versions < 1.26.0 while at the same time avoiding the `DeprecationWarning`
+            # for versions >= 1.26.0
+            key = "allowed_methods" if version.parse(urllib3.__version__) >= version.parse("1.26.0") else "method_whitelist"
+            kwargs = {key: False}  # retry on any HTTP method
+            max_retries = Retry(total=retry,
+                                status_forcelist=[429, 502, 503, 504],
+                                backoff_factor=0.5,
+                                **kwargs)
+            adapter = HTTPAdapter(max_retries=max_retries)
             self.client._http.mount("https://", adapter)
 
         self.bucket = self.client.bucket(self._bucket_name)
