@@ -20,12 +20,17 @@ Possible types of changes are:
 Unreleased
 ----------
 
+Fixed
+'''''
+- Ensure compatibility with ``urllib3`` versions smaller than ``1.26.0`` - the first version that introduced the ``allowed_methods`` argument
+  and started deprecation of the ``method_whitelist`` argument.
+
 1.4.2 - 24.02.2021
 ------------------
 
 Fixed
 '''''
-- Changed keyword argument of underlying dependency urllib3 from `method_whitelist` to `allowed_methods` to avoid deprecation warning (#39)
+- Changed keyword argument of underlying dependency urllib3 from ``method_whitelist`` to ``allowed_methods`` to avoid deprecation warning (#39)
 
 1.4.1 - 06.07.2020
 ------------------
