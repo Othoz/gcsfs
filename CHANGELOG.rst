@@ -16,6 +16,14 @@ Possible types of changes are:
 - `Fixed` for any bug fixes
 - `Security` in case of vulnerabilities
 
+1.4.5 - 25.03.2021
+------------------
+
+Fixed
+'''''
+- Added missing ``requests`` dependency.
+
+
 1.4.4 - 25.03.2021
 ------------------
 
