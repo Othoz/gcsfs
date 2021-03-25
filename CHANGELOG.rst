@@ -16,9 +16,16 @@ Possible types of changes are:
 - `Fixed` for any bug fixes
 - `Security` in case of vulnerabilities
 
+1.4.4 - 25.03.2021
+------------------
 
-Unreleased
-----------
+Fixed
+'''''
+- Added missing ``urllib3`` and ``packaging`` dependencies.
+
+
+1.4.3 - 24.03.2021
+------------------
 
 Fixed
 '''''
