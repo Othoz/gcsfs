@@ -29,7 +29,7 @@ if __name__ == "__main__":
             "fs~=2.0",
             "google-cloud-storage~=1.0",
             "urllib3~=1.25",
-            "packaging~=20.0",
+            "packaging>=20.0",
             "requests~=2.20"
         ],
         entry_points={
