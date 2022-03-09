@@ -16,6 +16,16 @@ Possible types of changes are:
 - `Fixed` for any bug fixes
 - `Security` in case of vulnerabilities
 
+1.5.0 - 09.03.2022
+------------------
+Added
+'''''
+- missing ``preserve_time`` keyword arguments to methods ``copy`` and ``move``
+
+Fixed
+'''''
+- calls to deprecated methods ``getbasic``, ``setbytes``, and ``getbytes``.
+
 1.4.5 - 25.03.2021
 ------------------
 
