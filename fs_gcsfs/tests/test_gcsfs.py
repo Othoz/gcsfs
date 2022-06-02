@@ -141,7 +141,7 @@ def test_fix_storage_does_not_overwrite_existing_directory_markers_with_custom_c
 
     gcsfs.fix_storage()
 
-    assert blob.download_as_string() == content
+    assert blob.download_as_bytes() == content
 
 
 def test_instantiation_with_create_false_fails_for_non_existing_root_path():

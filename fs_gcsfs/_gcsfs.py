@@ -458,7 +458,7 @@ class GCSFS(FS):
         # Implemented to support skipping the directory check if strict=False
         _factory = factory or SubFS
 
-        if self.strict and not self.getbasic(path).is_dir:
+        if self.strict and not self.getinfo(path).is_dir:
             raise errors.DirectoryExpected(path=path)
 
         return _factory(self, path)
@@ -653,13 +653,13 @@ class GCSMap(MutableMapping):
 
     def __getitem__(self, key: Any) -> bytes:
         try:
-            return self.gcsfs.getbytes(str(key))
+            return self.gcsfs.readbytes(str(key))
         except errors.ResourceNotFound:
             raise KeyError(key)
 
     def __setitem__(self, key: Any, value: Any) -> None:
         self.gcsfs.makedirs(dirname(str(key)), recreate=True)
-        self.gcsfs.setbytes(str(key), bytes(value))
+        self.gcsfs.writebytes(str(key), bytes(value))
 
     def __delitem__(self, key) -> None:
         self.gcsfs.remove(str(key))
