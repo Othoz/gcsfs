@@ -16,6 +16,19 @@ Possible types of changes are:
 - `Fixed` for any bug fixes
 - `Security` in case of vulnerabilities
 
+
+1.4.6 - 02.06.2021
+------------------
+
+Fixed
+'''''
+- Relax version constraints for dependency ``packaging`` and ``google-cloud-storage``.
+
+Added
+'''''
+- Added support for ``preserve_time`` keyword argument to ``copy`` and ``move`` operations introduced in fs 2.4.13
+
+
 1.4.5 - 25.03.2021
 ------------------
 
