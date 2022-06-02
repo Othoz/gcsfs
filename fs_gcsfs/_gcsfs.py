@@ -404,7 +404,7 @@ class GCSFS(FS):
     def setinfo(self, path, info):
         self.getinfo(path)
 
-    def copy(self, src_path: str, dst_path: str, overwrite: bool = False) -> None:
+    def copy(self, src_path: str, dst_path: str, overwrite: bool = False, preserve_time: bool = False) -> None:
         if not overwrite and self.exists(dst_path):
             raise errors.DestinationExists(dst_path)
         _src_path = self.validatepath(src_path)
@@ -422,7 +422,7 @@ class GCSFS(FS):
             raise errors.ResourceNotFound(_src_key)
         self.bucket.copy_blob(blob, self.bucket, new_name=_dst_key)
 
-    def move(self, src_path: str, dst_path: str, overwrite: bool = False) -> None:
+    def move(self, src_path: str, dst_path: str, overwrite: bool = False, preserve_time: bool = False) -> None:
         self.copy(src_path, dst_path, overwrite=overwrite)
         self.remove(src_path)
 
