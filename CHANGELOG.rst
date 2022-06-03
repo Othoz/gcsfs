@@ -16,6 +16,15 @@ Possible types of changes are:
 - `Fixed` for any bug fixes
 - `Security` in case of vulnerabilities
 
+
+
+1.5.1 - 03.06.2022
+------------------
+Fixed
+'''''
+- Relax version constraints for dependency ``packaging`` and ``google-cloud-storage``.
+
+
 1.5.0 - 09.03.2022
 ------------------
 Added
