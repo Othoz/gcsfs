@@ -20,7 +20,7 @@ Possible types of changes are:
 ------------------
 Added
 '''''
-- missing ``preserve_time`` keyword arguments to methods ``copy`` and ``move``
+- missing ``preserve_time`` keyword arguments to the methods ``copy`` and ``move``
 
 Fixed
 '''''
