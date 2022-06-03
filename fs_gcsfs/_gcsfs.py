@@ -6,6 +6,7 @@ import logging
 import os
 import tempfile
 import mimetypes
+import warnings
 from typing import Optional, List, Union, Tuple, Iterator, MutableMapping, Any
 
 import google
@@ -404,7 +405,9 @@ class GCSFS(FS):
     def setinfo(self, path, info):
         self.getinfo(path)
 
-    def copy(self, src_path: str, dst_path: str, overwrite: bool = False, preserve_time: bool = False) -> None:
+    def copy(self, src_path: str, dst_path: str, overwrite: bool = False, preserve_time=False) -> None:
+        if preserve_time:
+            warnings.warn("`GCSFS` cannot preserve time on `copy` operations, ignoring `preserve_time=True`.")
         if not overwrite and self.exists(dst_path):
             raise errors.DestinationExists(dst_path)
         _src_path = self.validatepath(src_path)
@@ -423,7 +426,7 @@ class GCSFS(FS):
         self.bucket.copy_blob(blob, self.bucket, new_name=_dst_key)
 
     def move(self, src_path: str, dst_path: str, overwrite: bool = False, preserve_time: bool = False) -> None:
-        self.copy(src_path, dst_path, overwrite=overwrite)
+        self.copy(src_path, dst_path, overwrite=overwrite, preserve_time=preserve_time)
         self.remove(src_path)
 
     def exists(self, path: str) -> bool:
@@ -458,7 +461,8 @@ class GCSFS(FS):
         # Implemented to support skipping the directory check if strict=False
         _factory = factory or SubFS
 
-        if self.strict and not self.getinfo(path).is_dir:
+        # if self.strict and not self.getbasic(path).is_dir:
+        if self.strict and not self.getinfo(path, namespaces=["basic"]).is_dir:
             raise errors.DirectoryExpected(path=path)
 
         return _factory(self, path)

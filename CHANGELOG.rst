@@ -16,18 +16,15 @@ Possible types of changes are:
 - `Fixed` for any bug fixes
 - `Security` in case of vulnerabilities
 
-
-1.4.6 - 02.06.2021
+1.5.0 - 09.03.2022
 ------------------
+Added
+'''''
+- missing ``preserve_time`` keyword arguments to the methods ``copy`` and ``move``
 
 Fixed
 '''''
-- Relax version constraints for dependency ``packaging`` and ``google-cloud-storage``.
-
-Added
-'''''
-- Added support for ``preserve_time`` keyword argument to ``copy`` and ``move`` operations introduced in fs 2.4.13
-
+- calls to deprecated methods ``getbasic``, ``setbytes``, and ``getbytes``.
 
 1.4.5 - 25.03.2021
 ------------------
