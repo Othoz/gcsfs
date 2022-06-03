@@ -21,7 +21,7 @@ class GCSFSOpener(Opener):
         root_path = join(*path_parts[1:])
 
         if not bucket_name:
-            raise OpenerError("invalid bucket name in '{}'".format(fs_url))
+            raise OpenerError("Invalid bucket name in '{}'".format(fs_url))
 
         if parse_result.params.get("strict") == "False":
             strict = False
