@@ -70,6 +70,8 @@ class GCSFS(FS):
         if not root_path:
             root_path = ""
         self.root_path = root_path
+        if self.root_path.endswith("/"):
+            raise ValueError("root_path must not end with a slash")
         self._prefix = relpath(normpath(root_path)).rstrip(self.DELIMITER)
 
         self.strict = strict
