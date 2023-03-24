@@ -179,7 +179,10 @@ class GCSFS(FS):
                 "type": int(ResourceType.file)
             }
         # TODO more namespaces: basic, urls, gcs, ...
-
+        if "urls" in namespaces:
+            info["urls"] = {
+                "http": blob.public_url
+            }
         return Info(info)
 
     def _dir_info(self, name: str) -> Info:
