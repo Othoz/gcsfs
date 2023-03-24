@@ -149,7 +149,7 @@ class GCSFS(FS):
 
         dir_key = self._path_to_dir_key(_path)
 
-        self._get_blob_from_path(_path)
+        blob = self._get_blob_from_path(_path)
         if blob:
             # Check if there exists a blob at the provided path, return the corresponding object Info
             return self._info_from_blob(blob, namespaces)
