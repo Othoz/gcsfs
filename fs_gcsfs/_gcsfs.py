@@ -177,6 +177,11 @@ class GCSFS(FS):
             }
         # TODO more namespaces: basic, urls, gcs, ...
 
+        if "gcs" in namespaces:
+            info["gcs"] = {
+                "blob": blob,
+                "public_url": blob.public_url,
+            }
         return Info(info)
 
     def _dir_info(self, name: str) -> Info:
