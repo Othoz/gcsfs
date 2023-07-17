@@ -18,6 +18,22 @@ Possible types of changes are:
 
 
 
+Unreleased
+----------
+Fixed
+'''''
+- Infinite loop in ``GCSFS.fix_storage()`` when the bucket contains blobs or
+  directories (with or without empty blob) on the same hierarchy level as
+  ``root_path`` and whose name also starts with the ``root_path`` directory
+  name. For example, having ``root_path = "gs://mybucket/abc"`` and these
+  blobs in the bucket:
+
+  .. code-block::
+
+      gs://mybucket/abc/file.txt
+      gs://mybucket/abc123/file.txt
+
+
 1.5.1 - 03.06.2022
 ------------------
 Fixed
