@@ -147,7 +147,7 @@ make sure to set up a `Service Account <https://cloud.google.com/iam/docs/servic
 - storage.objects.update
 - storage.objects.delete
 
-All five permissions listed above are e.g. included in the `predefined Cloud Storage IAM Role <https://cloud.google.com/storage/docs/access-control/iam-roles>`__ ``roles/storage.objectAdmin``.
+All five permissions listed above are e.g. included in the `predefined Cloud Storage IAM Role <https://cloud.google.com/storage/docs/access-control/iam-roles>`__ ``roles/storage.objectUser``.
 
 Expose your bucket name as an environment variable ``$TEST_BUCKET`` and run the tests via::
 
