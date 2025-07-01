@@ -28,7 +28,7 @@ if __name__ == "__main__":
         install_requires=[
             "fs~=2.2",  # require at least 2.2 since we are using functions such as readbytes() and writebytes() that have been introduced in 2.2
             "google-cloud-storage>=1.0",  # but 1.x and 2.x work. The major change in 2.x was to drop Python 2 support which fs-gcsfs does not support anyways.
-            "urllib3~=1.25",
+            "urllib3>=2.5.0",
             "packaging>=20.0",  # does not use semver so there's no need to restrict to a fixed major version
             "requests~=2.20"
         ],
