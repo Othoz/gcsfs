@@ -1,3 +1,12 @@
+⚠️ ARCHIVED / UNMAINTAINED
+=========================
+
+This repository is no longer actively maintained. It has been archived for historical purposes. The code is provided as-is, and no further updates, bug fixes, or support will be provided. 
+
+If you need to make changes, feel free to fork the repository!
+
+As an alternative, have a look at https://github.com/fsspec/gcsfs.
+
 GCSFS
 =====
 
