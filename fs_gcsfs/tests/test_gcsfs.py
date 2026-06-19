@@ -117,14 +117,28 @@ def test_create_property_does_not_create_file_if_emptyish_root_path(root_path, c
 
 def test_fix_storage_adds_binary_blobs_with_empty_string_as_directory_marker(bucket, gcsfs):
     # Creating a 'nested' hierarchy of blobs without directory marker
+    content = b"Is this a test? It has to be. Otherwise I can't go on."
     for path in ["foo/test", "foo/bar/test", "foo/baz/test", "foo/bar/egg/test"]:
         key = gcsfs._path_to_key(path)
         blob = bucket.blob(key)
-        blob.upload_from_string(b"Is this a test? It has to be. Otherwise I can't go on.")
+        blob.upload_from_string(content)
+
+    # Create a blob inside a directory that is sibling to `root_path` and whose path happens to be the same as the
+    # `root_path`, but with an added suffix. That directory should be left untouched, as it is not contained under
+    # `root_path`, despite sharing the same path prefix.
+    sibling_dir = gcsfs.root_path.rstrip("/") + "_suffix"
+    file_in_sibling_dir = f"{sibling_dir}/test"
+    bucket.blob(file_in_sibling_dir).upload_from_string(content)
+
     gcsfs.fix_storage()
 
+    # Assert that empty blobs were created for directories in the hierarchy under `root_path`
     for path in ["", "foo", "foo/bar", "foo/baz", "foo/bar/egg"]:
         assert gcsfs.isdir(path)
+
+    # Assert that the sibling directory was left untouched
+    assert not bucket.blob(sibling_dir).exists()
+    assert bucket.blob(file_in_sibling_dir).exists()
 
 
 def test_fix_storage_does_not_overwrite_existing_directory_markers_with_custom_content(bucket, gcsfs):

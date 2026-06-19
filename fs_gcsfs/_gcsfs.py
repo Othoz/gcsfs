@@ -481,7 +481,7 @@ class GCSFS(FS):
         As GCS is no real file system but only a key-value store, there is also no concept of folders. S3FS and GCSFS overcome this limitation by adding
         empty files with the name "<path>/" every time a directory is created, see https://fs-gcsfs.readthedocs.io/en/latest/#limitations.
         """
-        names = [blob.name for blob in self.bucket.list_blobs(prefix=self.root_path)]
+        names = [blob.name for blob in self.client.list_blobs(self.bucket, prefix=forcedir(self.root_path))]
         marked_dirs = set()
         all_dirs = set()
 
