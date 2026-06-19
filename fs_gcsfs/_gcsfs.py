@@ -127,6 +127,10 @@ class GCSFS(FS):
         """Returns blob if exists or None otherwise"""
         return self.bucket.get_blob(key)
 
+    def _get_blob_from_path(self, path: str) -> Optional[Blob]:
+        """Returns blob if exists or None otherwise"""
+        return self._get_blob(self._path_to_key(path))
+
     def getinfo(self, path: str, namespaces: Optional[List[str]] = None, check_parent_dir: bool = True) -> Info:
         if check_parent_dir:
             self.check()
@@ -143,10 +147,9 @@ class GCSFS(FS):
         if _path == "/":
             return self._dir_info("")
 
-        key = self._path_to_key(_path)
         dir_key = self._path_to_dir_key(_path)
 
-        blob = self._get_blob(key)
+        blob = self._get_blob_from_path(_path)
         if blob:
             # Check if there exists a blob at the provided path, return the corresponding object Info
             return self._info_from_blob(blob, namespaces)
@@ -176,7 +179,10 @@ class GCSFS(FS):
                 "type": int(ResourceType.file)
             }
         # TODO more namespaces: basic, urls, gcs, ...
-
+        if "urls" in namespaces:
+            info["urls"] = {
+                "http": blob.public_url
+            }
         return Info(info)
 
     def _dir_info(self, name: str) -> Info:
@@ -442,11 +448,14 @@ class GCSFS(FS):
             return self.isdir(path)
 
     def geturl(self, path: str, purpose: str = "download"):
-        # TODO This does currently not have the same functionality as S3FS.geturl() (returning a public URL) which may be confusing to users
         _path = self.validatepath(path)
         _key = self._path_to_key(_path)
         if purpose == "download":
-            return "gs://" + self.DELIMITER.join([self._bucket_name, _key])
+            blob = self._get_blob_from_path(_path)
+            if blob.public_url:
+                return blob.public_url
+            # TODO This does currently not have the ability to return a signed URL.
+            return None
         else:
             raise errors.NoURL(path, purpose)
 
